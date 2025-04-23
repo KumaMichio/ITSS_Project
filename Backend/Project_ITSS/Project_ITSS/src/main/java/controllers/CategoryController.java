@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/categories")
+@RequestMapping("api/categories")
 public class CategoryController {
     // Hiện tất cả các categories
 
@@ -17,4 +17,6 @@ public class CategoryController {
     public ResponseEntity<String> getAllCategories(){
         return ResponseEntity.ok("hehe");
     }
+
+
 }
