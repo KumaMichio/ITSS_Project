@@ -3,6 +3,8 @@ package models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.Inheritance;
+
 
 import java.time.LocalDate;
 
@@ -14,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Table(name = "products")
-@Inheritance(strategy = Inheritance.JOINED)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +42,5 @@ public class Product {
 
     @Column(name = "weight")
     private double weight;
-
 
 }
