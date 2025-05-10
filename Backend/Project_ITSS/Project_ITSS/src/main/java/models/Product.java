@@ -43,4 +43,15 @@ public class Product {
     @Column(name = "weight")
     private double weight;
 
+    public Product(String title, int price, String category, String imageUrl, int quantity, LocalDate entryDate, double dimension, double weight, int sellerId) {
+        this.title = title;
+        this.price = price;
+        this.category = category;
+       // this.imageUrl = imageUrl;
+        this.quantity = quantity;
+        this.entry_date = entryDate;
+        this.dimension = dimension;
+        this.weight = weight;
+    }
+
 }
