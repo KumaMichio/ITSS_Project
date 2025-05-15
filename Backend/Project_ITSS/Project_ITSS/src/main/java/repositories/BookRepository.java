@@ -7,21 +7,21 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
+
+import java.sql.Date;
 import java.util.List;
 
-public interface BookRepository extends JpaRepository<Book, Long> {
+public interface BookRepository extends JpaRepository<Book, Integer> {
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO dvds (id, author, publisher, coverType, publicationDate, pagesNumber, language, genre) VALUES (:id, :author, :publisher, :coverType, :publicationDate, :pagesNumber, :language, :genre)", nativeQuery = true)
-    void customInsert(@Param("id") long id,
-                      @Param("author") String author,
+    @Query(value = "INSERT INTO books (author, publisher, coverType, publicationDate, pagesNumber, language, genre) VALUES (:author, :publisher, :coverType, :publicationDate, :pagesNumber, :language, :genre)", nativeQuery = true)
+    void customInsert(@Param("author") String author,
                       @Param("publisher") String publisher,
                       @Param("coverType") String coverType,
-                      @Param("publicationDate") LocalDate publicationDate,
-                      @Param("pages") int pages,
-                      @Param("language") String language
-    );
+                      @Param("publicationDate") Date publicationDate,
+                      @Param("pagesNumber") int pagesNumber,
+                      @Param("language") String language,
+                      @Param("genre") String genre);
 
     List<Book> findByTitleContaining(String title);
 }
