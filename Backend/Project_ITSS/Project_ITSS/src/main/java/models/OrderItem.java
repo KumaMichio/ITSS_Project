@@ -15,10 +15,15 @@ import lombok.*;
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_item_id")
-    private int id;
+    int id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order orderID;
+    int productId;
+
+    int quantity;
+
+    int price;
+
+    @Column(nullable = true)
+    int orderId;
+
 }
