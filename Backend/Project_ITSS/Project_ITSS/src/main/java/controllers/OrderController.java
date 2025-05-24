@@ -1,5 +1,6 @@
 package controllers;
 
+import dtos.OrderDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,8 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<OrderDto>> getOrdersByUserId(@PathVariable int id) {
-        List<OrderDto> orders = orderService.getOrdersByUserId(id);
+    public ResponseEntity<List<OrderDTO>> getOrdersByUserId(@PathVariable int id) {
+        List<OrderDTO> orders = orderService.getOrdersByUserId(id);
         return ResponseEntity.ok(orders);
     }
 

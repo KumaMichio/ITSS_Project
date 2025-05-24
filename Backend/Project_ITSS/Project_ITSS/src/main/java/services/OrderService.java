@@ -1,5 +1,7 @@
 package services;
 
+import dtos.OrderDTO;
+import exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import models.DeliveryInformation;
 import models.Product;
@@ -11,7 +13,10 @@ import models.OrderItem;
 import models.Order;
 import repositories.ProductRepository;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +27,6 @@ public class OrderService implements IOrderService {
     private final OrderItemRepository orderItemRepository;
 
     // ----------------- Utility methods -------------------------
-
 
     @Override
     public Order createRegularOrder(List<Integer> orderProductIds, int userId) {
@@ -76,18 +80,18 @@ public class OrderService implements IOrderService {
                 .build();
         for (int orderProductId : orderProductIds)
         {
-            OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
+            OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
-            orderProduct.setOrderId(order.getId());
-            orderProductRepository.save(orderProduct);
+            orderItem.setOrderId(order.getOrder_id());
+            orderItemRepository.save(orderItem);
         }
         // Lưu đơn hàng
         return orderRepository.save(order);
     }
     @Override
-    public Orders createRegularOrderWithDeliveryId(List<Integer> orderProductIds, int deliveryId) {
+    public Order createRegularOrderWithDeliveryId(List<Integer> orderProductIds, int deliveryId) {
         // New implementation using deliveryId
-        DeliveryInfo deliveryInfo = deliveryInfoRepository.findById(deliveryId)
+        DeliveryInformation deliveryInfo = deliveryInfoRepository.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery info not found"));
 
         int userId = deliveryInfo.getUserId();
@@ -95,13 +99,13 @@ public class OrderService implements IOrderService {
         int totalAmount = 0;
         double totalWeight = 0;
         for (int orderProductId : orderProductIds) {
-            OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
+            OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
-            Product product = productRepository.findById(orderProduct.getProductId())
+            Product product = productRepository.findById(orderItem.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
-            totalAmount += orderProduct.getPrice();
-            totalWeight += product.getWeight() * orderProduct.getQuantity();
+            totalAmount += orderItem.getPrice();
+            totalWeight += product.getWeight() * orderItem.getQuantity();
         }
 
         int shippingFees;
@@ -124,7 +128,7 @@ public class OrderService implements IOrderService {
         int totalFee = totalAmount + shippingFees + vat;
 
         // Tạo đơn hàng mới
-        Orders order = Orders.orderBuilder()
+        Order order = Order.orderBuilder()
                 .shippingMethodId(shippingFees)
                 .deliveryInfoId(deliveryInfo.getId())
                 .totalAmount(totalAmount)
@@ -137,10 +141,10 @@ public class OrderService implements IOrderService {
                 .build();
         for (int orderProductId : orderProductIds)
         {
-            OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
+            OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
-            orderProduct.setOrderId(order.getId());
-            orderProductRepository.save(orderProduct);
+            orderItem.setOrderId(order.getOrder_id());
+            orderItemRepository.save(orderItem);
 
         }
         // Lưu đơn hàng
@@ -148,8 +152,8 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Orders createExpressOrder(List<Integer> orderProductIds, int deliveryId) {
-        DeliveryInfo deliveryInfo = deliveryInfoRepository.findById(deliveryId)
+    public Order createExpressOrder(List<Integer> orderProductIds, int deliveryId) {
+        DeliveryInformation deliveryInfo = deliveryInfoRepository.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery info not found"));
 
         if (!"Hà Nội".equalsIgnoreCase(deliveryInfo.getProvince())) {
@@ -162,18 +166,18 @@ public class OrderService implements IOrderService {
         int expressShippingFee = 0;
 
         for (int orderProductId : orderProductIds) {
-            OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
+            OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
-            int productId = orderProduct.getProductId();
+            int productId = orderItem.getProductId();
             if (productId < 1 || productId > 10) {
                 throw new RuntimeException("Express delivery is only available for products with ID from 1 to 10");
             }
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
-            totalAmount += orderProduct.getPrice();
-            totalWeight += product.getWeight() * orderProduct.getQuantity();
-            expressShippingFee += 10000 * orderProduct.getQuantity();
+            totalAmount += orderItem.getPrice();
+            totalWeight += product.getWeight() * orderItem.getQuantity();
+            expressShippingFee += 10000 * orderItem.getQuantity();
         }
 
         int shippingFees = 25000; // base fee for Hanoi
@@ -188,7 +192,7 @@ public class OrderService implements IOrderService {
         int vat = (int) (totalAmount / 10); // VAT is 10% of total amount
         int totalFee = totalAmount + shippingFees + vat;
 
-        Orders order = Orders.orderBuilder()
+        Order order = Order.orderBuilder()
                 .shippingFees(shippingFees)
                 .deliveryInfoId(deliveryInfo.getId())
                 .totalAmount(totalAmount)
@@ -201,47 +205,47 @@ public class OrderService implements IOrderService {
                 .build();
         for (int orderProductId : orderProductIds)
         {
-            OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
+            OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
-            orderProduct.setOrderId(order.getId());
-            orderProductRepository.save(orderProduct);
+            orderItem.setOrderId(order.getOrder_id());
+            orderItemRepository.save(orderItem);
 
         }
         return orderRepository.save(order);
     }
 
     @Override
-    public List<Orders> getAllOrders() {
+    public List<Order> getAllOrders() {
         return orderRepository.findAll(); // Retrieve all orders from the repository
     }
 
     @Override
-    public List<OrderDto> getOrdersByUserId(int userId) {
-        List<Orders> orders = orderRepository.findAll().stream().filter((Orders order) -> order.getUserId() == userId).sorted(Comparator.comparing(Orders::getId).reversed()).toList();
-        List<OrderDto> ordersDto = new ArrayList<OrderDto>();
-        for (Orders order : orders) {
-            Optional<DeliveryInfo> optionalDeliveryInfo = deliveryInfoRepository.findById(order.getDeliveryInfoId());
-            DeliveryInfo deliveryInfo = optionalDeliveryInfo.get();
+    public List<OrderDTO> getOrdersByUserId(int userId) {
+        List<Order> orders = orderRepository.findAll().stream().filter((Order order) -> order.getUserID().getUser_id() == userId).sorted(Comparator.comparing(Order::getOrder_id).reversed()).toList();
+        List<OrderDTO> ordersDto = new ArrayList<OrderDTO>();
+        for (Order order : orders) {
+            Optional<DeliveryInformation> optionalDeliveryInfo = deliveryInfoRepository.findById(order.getDeliveryID());
+            DeliveryInformation deliveryInfo = optionalDeliveryInfo.get();
             //
-            List<OrderProduct> orderProducts = orderProductRepository.findAll().stream().filter(op -> op.getOrderId() == order.getId()).toList();
+            List<OrderItem> orderItems = orderItemRepository.findAll().stream().filter(op -> op.getOrderId() == order.getOrder_id()).toList();
             List<Product> products = new ArrayList<>();
-            for (OrderProduct orderProduct : orderProducts) {
-                Optional<Product> optionalProduct =  productRepository.findById(orderProduct.getProductId());
+            for (OrderItem orderItem : orderItems) {
+                Optional<Product> optionalProduct =  productRepository.findById(orderItem.getProductId());
                 Product p = optionalProduct.get();
-                p.setQuantity(orderProduct.getQuantity());
+                p.setQuantity(orderItem.getQuantity());
                 products.add(p);
 
             }
 
-            OrderDto orderDto = new OrderDto(order.getId(), order.getShippingFees(), order.getTotalAmount(),order.getPlacedDate(), order.getCreatedAt(),order.getVAT(),order.getTotalFee(), order.getStartTime(), order.getEndTime(),order.isPayment(),deliveryInfo,products);
+            OrderDTO orderDto = new OrderDTO(order.getOrder_id(), order.getShippingFees(), order.getTotalAmount(),order.getPlacedDate(), order.getCreatedAt(),order.getVAT(),order.getTotalFee(), order.getStartTime(), order.getEndTime(),order.isPayment(),deliveryInfo,products);
             ordersDto.add(orderDto);
         }
         return ordersDto;
     }
 
     @Override
-    public Orders updateOrderStatus(int id) {
-        Orders order = orderRepository.findById(id)
+    public Order updateOrderStatus(int id) {
+        Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
         order.setPayment(true);
         return orderRepository.save(order);

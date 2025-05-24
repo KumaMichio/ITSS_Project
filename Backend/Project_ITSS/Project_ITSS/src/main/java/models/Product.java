@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @Builder
 @Table(name = "products")
 @Inheritance(strategy = InheritanceType.JOINED)
+
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
