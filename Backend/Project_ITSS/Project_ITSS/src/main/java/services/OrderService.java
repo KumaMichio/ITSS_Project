@@ -3,16 +3,11 @@ package services;
 import dtos.OrderDTO;
 import exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import models.DeliveryInformation;
-import models.Product;
+import models.*;
 import org.springframework.stereotype.Service;
-import repositories.DeliveryInfoRepository;
-import repositories.OrderItemRepository;
-import repositories.OrderRepository;
-import models.OrderItem;
-import models.Order;
-import repositories.ProductRepository;
+import repositories.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,14 +20,21 @@ public class OrderService implements IOrderService {
     private final DeliveryInfoRepository deliveryInfoRepository;
     private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
+    private final UserRepository userRepository;
+    private final ShippingMethodRepository shippingMethodRepository;
 
     // ----------------- Utility methods -------------------------
 
     @Override
     public Order createRegularOrder(List<Integer> orderProductIds, int userId) {
-        // Lấy thông tin giao hàng của người dùng
+        // Lấy thông tin các đối tượng liên quan
         DeliveryInformation deliveryInfo = deliveryInfoRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Delivery info not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ShippingMethod shippingMethod = shippingMethodRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("Shipping method not found")); // Giao hàng thường
 
         // Tính toán giá trị đơn hàng và phí vận chuyển
         int totalAmount = 0;
@@ -66,38 +68,49 @@ public class OrderService implements IOrderService {
         int vat = (int) (totalAmount / 10); // VAT là 10% của tổng giá trị đơn hàng
         int totalFee = totalAmount + shippingFees + vat;
 
-        // Tạo đơn hàng mới
+        // Tạo đơn hàng
         Order order = Order.orderBuilder()
-                .shippingMethodId(shippingFees)
-                .deliveryInfoId(deliveryInfo.getId())
+                .user(user)
+                .deliveryInformation(deliveryInfo)
+                .shippingMethod(shippingMethod)
+                .shippingFees(shippingFees)
                 .totalAmount(totalAmount)
-                .userId(userId)
-                .placedDate(LocalDate.now())
-                .createdAt(LocalTime.now())
-                .shippingMethodId(1) // Giao hàng thường
+                .created_at(LocalDateTime.now())
                 .VAT(vat)
-                .totalFee(totalFee)
+                .totalFees(totalFee)
                 .build();
-        for (int orderProductId : orderProductIds)
-        {
+
+        // Gán order cho từng OrderItem
+        for (int orderProductId : orderProductIds) {
             OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
-            orderItem.setOrderId(order.getOrder_id());
-            orderItemRepository.save(orderItem);
+
+            orderItem.setOrder(order); // Gán quan hệ thay vì setOrderId
+            order.getOrderItems().add(orderItem); // Thêm vào danh sách của đơn hàng (nếu bidirectional)
         }
-        // Lưu đơn hàng
+
+        // Lưu đơn hàng và cascade lưu luôn OrderItems nếu có CascadeType.ALL
         return orderRepository.save(order);
     }
     @Override
     public Order createRegularOrderWithDeliveryId(List<Integer> orderProductIds, int deliveryId) {
-        // New implementation using deliveryId
+        // Lấy thông tin địa chỉ giao hàng
         DeliveryInformation deliveryInfo = deliveryInfoRepository.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery info not found"));
 
+        // Lấy user từ deliveryInfo
         int userId = deliveryInfo.getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // sử dụng phương thức giao hàng thường
+        ShippingMethod shippingMethod = shippingMethodRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("Shipping method not found"));
 
+        // Tính tổng tiền và khối lượng
         int totalAmount = 0;
         double totalWeight = 0;
+        List<OrderItem> orderItems = new ArrayList<>();
+
         for (int orderProductId : orderProductIds) {
             OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
@@ -106,8 +119,11 @@ public class OrderService implements IOrderService {
 
             totalAmount += orderItem.getPrice();
             totalWeight += product.getWeight() * orderItem.getQuantity();
+
+            orderItems.add(orderItem); // Lưu lại danh sách orderItems để gán về sau
         }
 
+        // Tính phí vận chuyển
         int shippingFees;
         if (deliveryInfo.getProvince().equalsIgnoreCase("Hà Nội") || deliveryInfo.getProvince().equalsIgnoreCase("Ho Chi Minh city")) {
             if(totalWeight > 3)
@@ -124,26 +140,25 @@ public class OrderService implements IOrderService {
         if (totalAmount >100000 ) shippingFees -=25000;
 
         // Tính toán VAT và tổng phí
-        int vat = (int) (totalAmount / 10); // VAT là 10% của tổng giá trị đơn hàng
+        int vat = totalAmount / 10; // VAT là 10% của tổng giá trị đơn hàng
         int totalFee = totalAmount + shippingFees + vat;
 
         // Tạo đơn hàng mới
         Order order = Order.orderBuilder()
-                .shippingMethodId(shippingFees)
-                .deliveryInfoId(deliveryInfo.getId())
+                .user(user)
+                .deliveryInformation(deliveryInfo)
+                .shippingMethod(shippingMethod)
+                .shippingFees(shippingFees)
                 .totalAmount(totalAmount)
-                .userId(userId)
-                .placedDate(LocalDate.now())
-                .createdAt(LocalTime.now())
-                .shippingMethodId(1) // Giao hàng thường
+                .created_at(LocalDateTime.now())
                 .VAT(vat)
-                .totalFee(totalFee)
+                .totalFees(totalFee)
                 .build();
         for (int orderProductId : orderProductIds)
         {
             OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
-            orderItem.setOrderId(order.getOrder_id());
+            orderItem.setOrder(order);
             orderItemRepository.save(orderItem);
 
         }

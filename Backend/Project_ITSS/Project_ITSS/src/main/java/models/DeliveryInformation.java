@@ -7,7 +7,6 @@ import lombok.Builder;
 @Setter
 @Getter
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

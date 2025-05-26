@@ -14,7 +14,6 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
 @Builder(builderMethodName = "cdlpBuilder")
 @Table(name = "cdlps")
 @PrimaryKeyJoinColumn(name = "product_id")

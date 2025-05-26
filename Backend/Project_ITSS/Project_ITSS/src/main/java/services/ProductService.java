@@ -39,7 +39,7 @@ public class ProductService {
     private final CDLPRepository cdlpRepository;
 
     public void addProduct(Product product) {
-        productRepository.CustomInsert(
+        productRepository.customInsert(
                 product.getTitle(),
                 product.getPrice(),
                 product.getCategory(),
@@ -47,9 +47,11 @@ public class ProductService {
                 product.getQuantity(),
                 product.getEntry_date(),
                 product.getDimension(),
-                product.getWeight()
+                product.getWeight(),
+                product.getSellerId().getUserId()
         );
     }
+
 
 
     public Product insertProduct(Product product) {

@@ -1,13 +1,16 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Entity
 @Builder(builderMethodName = "shippingMethodBuilder")
 public class ShippingMethod {
@@ -21,4 +24,8 @@ public class ShippingMethod {
     private boolean is_rush;
 
     private double shipping_fees;
+
+    @OneToMany(mappedBy = "shippingMethod", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Order> orders = new ArrayList<>();
 }

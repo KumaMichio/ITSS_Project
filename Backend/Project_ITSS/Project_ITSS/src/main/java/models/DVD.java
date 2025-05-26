@@ -15,7 +15,6 @@ import java.sql.Time;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
 @Builder(builderMethodName = "dvdBuilder")
 @Table(name = "dvds")
 @PrimaryKeyJoinColumn(name = "product_id")

@@ -1,15 +1,17 @@
 package models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
 @Builder(builderMethodName = "userBuilder")
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -18,7 +20,7 @@ public class User {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int user_id;
+    private int userId;
 
     private String username;
 
@@ -27,4 +29,9 @@ public class User {
     private String role;
 
     private String password;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Product> products;
+
 }

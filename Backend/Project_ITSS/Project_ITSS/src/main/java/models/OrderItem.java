@@ -7,7 +7,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Entity
 @Builder(builderMethodName = "orderitemBuilder")
 @Table(name = "orderitem")
@@ -21,9 +20,10 @@ public class OrderItem {
 
     int quantity;
 
-    int price;
+    double price;
 
-    @Column(nullable = true)
-    int orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id") // tên cột trong DB
+    private Order order;
 
 }

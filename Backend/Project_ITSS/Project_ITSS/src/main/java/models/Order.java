@@ -14,25 +14,36 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
 @Builder(builderMethodName = "orderBuilder")
 @Table(name = "orders")
 
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int order_id;
+    private int orderId;
 
+    // ======= RELATION TO USER =======
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User userID;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
+    // ======= RELATION TO DELIVERY =======
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_id")
-    private DeliveryInformation deliveryID;
+    private DeliveryInformation deliveryInformation;
+
+    // ======= RELATION TO TRANSACTION =======
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transaction_id")
+    private TransactionInformation transaction;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    // ======= RELATION TO SHIPPINGMETHOD =======
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "method_id")
+    private ShippingMethod shippingMethod;
 
     @Column(name = "shipping_fees")
     private double shippingFees;
@@ -40,13 +51,11 @@ public class Order {
     @Column(name = "total_amount")
     private double totalAmount;
 
-    private LocalTime created_at;
+    private LocalDateTime created_at;
 
     private int VAT;
 
     private double totalFees;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaciton_id")
-    private TransactionInformation transactionID;
+
 }

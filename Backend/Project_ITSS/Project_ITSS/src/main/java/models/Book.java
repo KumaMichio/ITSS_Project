@@ -14,7 +14,6 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
 @Builder(builderMethodName = "bookBuilder")
 @Table(name = "books")
 @PrimaryKeyJoinColumn(name = "product_id")
