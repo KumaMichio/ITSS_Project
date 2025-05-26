@@ -1,7 +1,13 @@
 package controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import models.OrderItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import services.CartService;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -10,39 +16,39 @@ public class CartController {
     private CartService cartService;
 
     @GetMapping
-    public List<OrderProduct> getAllOrderProducts() {
-        return cartService.getAllOrderProducts();
+    public List<OrderItem> getAllOrderItems() {
+        return cartService.getAllOrderItems();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderProduct> getOrderProductById(@PathVariable int id) {
-        Optional<OrderProduct> orderProduct = cartService.getOrderProductById(id);
+    public ResponseEntity<OrderItem> getOrderItemById(@PathVariable int id) {
+        Optional<OrderItem> orderProduct = cartService.getOrderItemById(id);
         return orderProduct.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public OrderProduct addOrderProduct(@RequestBody OrderProduct orderProduct) {
-        return cartService.addOrderProduct(orderProduct);
+    public OrderItem addOrderItem(@RequestBody OrderItem orderProduct) {
+        return cartService.addOrderItem(orderProduct);
     }
 
     @PostMapping("/add")
-    public List<OrderProduct> addOrderProducts(@RequestBody List<OrderProduct> orderProducts) {
-        return cartService.addOrderProducts(orderProducts);
+    public List<OrderItem> addOrderItems(@RequestBody List<OrderItem> orderProducts) {
+        return cartService.addOrderItems(orderProducts);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderProduct> updateOrderProduct(@PathVariable int id, @RequestBody OrderProduct orderProduct) {
-        OrderProduct updatedOrderProduct = cartService.updateOrderProduct(id, orderProduct);
-        if (updatedOrderProduct != null) {
-            return ResponseEntity.ok(updatedOrderProduct);
+    public ResponseEntity<OrderItem> updateOrderItem(@PathVariable int id, @RequestBody OrderItem orderProduct) {
+        OrderItem updatedOrderItem = cartService.updateOrderItem(id, orderProduct);
+        if (updatedOrderItem != null) {
+            return ResponseEntity.ok(updatedOrderItem);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PutMapping("/order/{id}")
-    public ResponseEntity<String> updateOrderProductId(@RequestBody List<Integer> orderProductIds, @PathVariable int id) {
-        String result = cartService.updateOrderProductId(orderProductIds, id);
+    public ResponseEntity<String> updateOrderItemId(@RequestBody List<Integer> orderProductIds, @PathVariable int id) {
+        String result = cartService.updateOrderItemId(orderProductIds, id);
         if (result != null) {
             return ResponseEntity.ok(result);
         } else {
@@ -52,7 +58,7 @@ public class CartController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrderProduct(@PathVariable int id) {
-        cartService.deleteOrderProduct(id);
+        cartService.deleteOrderItem(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -4,6 +4,7 @@ import dtos.OrderDTO;
 import exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import models.*;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.stereotype.Service;
 import repositories.*;
 
@@ -75,7 +76,7 @@ public class OrderService implements IOrderService {
                 .shippingMethod(shippingMethod)
                 .shippingFees(shippingFees)
                 .totalAmount(totalAmount)
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .VAT(vat)
                 .totalFees(totalFee)
                 .build();
@@ -99,9 +100,8 @@ public class OrderService implements IOrderService {
                 .orElseThrow(() -> new RuntimeException("Delivery info not found"));
 
         // Lấy user từ deliveryInfo
-        int userId = deliveryInfo.getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = deliveryInfo.getUser();
+
         // sử dụng phương thức giao hàng thường
         ShippingMethod shippingMethod = shippingMethodRepository.findById(1)
                 .orElseThrow(() -> new RuntimeException("Shipping method not found"));
@@ -150,7 +150,7 @@ public class OrderService implements IOrderService {
                 .shippingMethod(shippingMethod)
                 .shippingFees(shippingFees)
                 .totalAmount(totalAmount)
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .VAT(vat)
                 .totalFees(totalFee)
                 .build();
@@ -175,27 +175,31 @@ public class OrderService implements IOrderService {
             throw new RuntimeException("Express delivery is only available in Hà Nội");
         }
 
-        int userId = deliveryInfo.getUserId();
+        User user = deliveryInfo.getUser();
         int totalAmount = 0;
         double totalWeight = 0;
         int expressShippingFee = 0;
+        List<OrderItem> orderItems = new ArrayList<>();
 
         for (int orderProductId : orderProductIds) {
             OrderItem orderItem = orderItemRepository.findById(orderProductId)
                     .orElseThrow(() -> new RuntimeException("Order product not found"));
+
             int productId = orderItem.getProductId();
             if (productId < 1 || productId > 10) {
                 throw new RuntimeException("Express delivery is only available for products with ID from 1 to 10");
             }
+
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
             totalAmount += orderItem.getPrice();
             totalWeight += product.getWeight() * orderItem.getQuantity();
             expressShippingFee += 10000 * orderItem.getQuantity();
+            orderItems.add(orderItem);
         }
 
-        int shippingFees = 25000; // base fee for Hanoi
+        double shippingFees = 25000; // base fee for Hanoi
         if (totalWeight > 3) {
             shippingFees += (int) (2500 * Math.ceil((totalWeight - 3) / 0.5));
         }
@@ -205,28 +209,36 @@ public class OrderService implements IOrderService {
         }
 
         int vat = (int) (totalAmount / 10); // VAT is 10% of total amount
-        int totalFee = totalAmount + shippingFees + vat;
+        double totalFees = totalAmount + shippingFees + vat;
 
         Order order = Order.orderBuilder()
+                .user(user)
+                .deliveryInformation(deliveryInfo)
+                .shippingMethod(shippingMethodRepository.findById(2).orElseThrow(() -> new RuntimeException("Shipping method not found")))
                 .shippingFees(shippingFees)
-                .deliveryInfoId(deliveryInfo.getId())
                 .totalAmount(totalAmount)
-                .userId(userId)
-                .placedDate(LocalDate.now())
-                .createdAt(LocalTime.now())
-                .shippingMethodId(2) // Express delivery
+                .createdAt(LocalDateTime.now())
                 .VAT(vat)
-                .totalFee(totalFee)
+                .totalFees(totalFees)
                 .build();
-        for (int orderProductId : orderProductIds)
-        {
-            OrderItem orderItem = orderItemRepository.findById(orderProductId)
-                    .orElseThrow(() -> new RuntimeException("Order product not found"));
-            orderItem.setOrderId(order.getOrder_id());
-            orderItemRepository.save(orderItem);
-
+        // Gán quan hệ hai chiều cho OrderItem
+        for (OrderItem item : orderItems) {
+            item.setOrder(order); // set Order cho từng item
         }
+
+        order.setOrderItems(orderItems);
+
         return orderRepository.save(order);
+
+//        for (int orderProductId : orderProductIds)
+//        {
+//            OrderItem orderItem = orderItemRepository.findById(orderProductId)
+//                    .orElseThrow(() -> new RuntimeException("Order product not found"));
+//            orderItem.setOrderId(order.getOrder_id());
+//            orderItemRepository.save(orderItem);
+//
+//        }
+//        return orderRepository.save(order);
     }
 
     @Override
@@ -236,13 +248,13 @@ public class OrderService implements IOrderService {
 
     @Override
     public List<OrderDTO> getOrdersByUserId(int userId) {
-        List<Order> orders = orderRepository.findAll().stream().filter((Order order) -> order.getUserID().getUser_id() == userId).sorted(Comparator.comparing(Order::getOrder_id).reversed()).toList();
+        List<Order> orders = orderRepository.findAll().stream().filter((Order order) -> order.getUser().getUserId() == userId).sorted(Comparator.comparing(Order::getOrderId).reversed()).toList();
         List<OrderDTO> ordersDto = new ArrayList<OrderDTO>();
         for (Order order : orders) {
-            Optional<DeliveryInformation> optionalDeliveryInfo = deliveryInfoRepository.findById(order.getDeliveryID());
+            Optional<DeliveryInformation> optionalDeliveryInfo = deliveryInfoRepository.findById(order.getDeliveryInformation().getId());
             DeliveryInformation deliveryInfo = optionalDeliveryInfo.get();
             //
-            List<OrderItem> orderItems = orderItemRepository.findAll().stream().filter(op -> op.getOrderId() == order.getOrder_id()).toList();
+            List<OrderItem> orderItems = orderItemRepository.findAll().stream().filter(op -> op.getOrder().getOrderId() == order.getOrderId()).toList();
             List<Product> products = new ArrayList<>();
             for (OrderItem orderItem : orderItems) {
                 Optional<Product> optionalProduct =  productRepository.findById(orderItem.getProductId());
@@ -251,8 +263,17 @@ public class OrderService implements IOrderService {
                 products.add(p);
 
             }
-
-            OrderDTO orderDto = new OrderDTO(order.getOrder_id(), order.getShippingFees(), order.getTotalAmount(),order.getPlacedDate(), order.getCreatedAt(),order.getVAT(),order.getTotalFee(), order.getStartTime(), order.getEndTime(),order.isPayment(),deliveryInfo,products);
+            OrderDTO orderDto = new OrderDTO(
+                    order.getOrderId(),
+                    order.getShippingFees(),
+                    order.getTotalAmount(),
+                    order.getCreatedAt(),
+                    order.getVAT(),
+                    order.getTotalFees(),
+                    order.isPayment(),
+                    order.getDeliveryInformation(),
+                    products
+            );
             ordersDto.add(orderDto);
         }
         return ordersDto;

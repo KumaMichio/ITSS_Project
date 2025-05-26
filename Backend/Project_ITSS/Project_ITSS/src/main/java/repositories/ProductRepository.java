@@ -31,7 +31,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             @Param("entryDate") LocalDate entryDate,
             @Param("dimension") double dimension,
             @Param("weight") double weight,
-            @Param("sellerId") int sellerId // ✅ Thêm sellerId
+            @Param("sellerId") int sellerId
     );
 
     List<Product> findByTitleContaining(String title);

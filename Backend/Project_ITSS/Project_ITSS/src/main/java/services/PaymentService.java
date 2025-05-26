@@ -4,14 +4,17 @@ import config.VNPayConfig;
 import dtos.PaymentDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import models.Order;
 import org.springframework.stereotype.Service;
 import repositories.OrderRepository;
 
 import java.util.Map;
+import java.util.Optional;
+import util.VNPayUtil;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentService {
+public class PaymentService implements IPaymentService{
     private final VNPayConfig vnPayConfig;
     private final OrderRepository orderRepository;
 
@@ -39,10 +42,10 @@ public class PaymentService {
 
     @Override
     public PaymentDTO.VNPayResponse createVnPayPaymentForOrder(HttpServletRequest request, int orderId) {
-        Optional<Orders> orderOpt = orderRepository.findById(orderId);
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isPresent()) {
-            Orders order = orderOpt.get();
-            long amount = (long) (order.getTotalFee() * 100L); // Assuming order amount is in smallest currency unit (e.g., cents)
+            Order order = orderOpt.get();
+            long amount = (long) (order.getTotalFees() * 100L); // Assuming order amount is in smallest currency unit (e.g., cents)
             String bankCode = request.getParameter("bankCode");
             Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig(orderId);
             vnpParamsMap.put("vnp_Amount", String.valueOf(amount));

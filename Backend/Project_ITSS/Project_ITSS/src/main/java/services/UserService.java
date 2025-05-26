@@ -63,13 +63,13 @@ public class UserService {
         User user = getUserOrThrow(userId);
 
         boolean hasOrders = orderRepository.findAll().stream()
-                .anyMatch(order -> order.getUserID().getUser_id() == userId);
+                .anyMatch(order -> order.getUser().getUserId() == userId);
         if (hasOrders) {
             throw new IllegalStateException("Cannot change role. User has existing orders.");
         }
 
         boolean hasProducts = productRepository.findAll().stream()
-                .anyMatch(product -> product.getSellerId().getUser_id() == userId);
+                .anyMatch(product -> product.getSellerId().getUserId() == userId);
         if (hasProducts) {
             throw new IllegalStateException("Cannot change role. User has listed products.");
         }
@@ -104,13 +104,13 @@ public class UserService {
 //        return userRepository.save(existingUser);
 //    }
 
-//    public void deleteUser(int id) throws UsernameNotFoundException {
-//        Optional<User> userOptional = userRepository.findById(id);
-//        if (userOptional.isEmpty()) {
-//            throw new UsernameNotFoundException("User not found with id: " + id);
-//        }
-//        userRepository.deleteById(id);
-//    }
+    public void deleteUser(int id) throws UsernameNotFoundException {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with id: " + id);
+        }
+        userRepository.deleteById(id);
+    }
 
 //    @Transactional
 //    public User changeUserRole(int userId, String newRole) {

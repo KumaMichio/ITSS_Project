@@ -51,11 +51,12 @@ public class Order {
     @Column(name = "total_amount")
     private double totalAmount;
 
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     private int VAT;
 
     private double totalFees;
 
+    boolean isPayment;
 
 }

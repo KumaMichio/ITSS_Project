@@ -29,7 +29,7 @@ public class TransactionService implements ITransactionService{
             double totalFee = order.getTotalFees(); // assuming totalFee is in the smallest currency unit
 
             TransactionInformation transactionInfo = TransactionInformation.builder()
-                    .orderId(orderId)
+                    .order(order)
                     .totalFee(totalFee)
                     .status(status)
                     .paymentMethod("VNPay")

@@ -1,7 +1,13 @@
 package controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import models.DeliveryInformation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import services.DeliveryInfoService;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/delivery-info")
@@ -10,24 +16,24 @@ public class DeliveryInfoController {
     private DeliveryInfoService deliveryInfoService;
 
     @GetMapping
-    public List<DeliveryInfo> getAllDeliveryInfos() {
+    public List<DeliveryInformation> getAllDeliveryInfos() {
         return deliveryInfoService.getAllDeliveryInfos();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DeliveryInfo> getDeliveryInfoById(@PathVariable int id) {
-        Optional<DeliveryInfo> deliveryInfo = deliveryInfoService.getDeliveryInfoById(id);
+    public ResponseEntity<DeliveryInformation> getDeliveryInfoById(@PathVariable int id) {
+        Optional<DeliveryInformation> deliveryInfo = deliveryInfoService.getDeliveryInfoById(id);
         return deliveryInfo.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public DeliveryInfo addDeliveryInfo(@RequestBody DeliveryInfo deliveryInfo) {
+    public DeliveryInformation addDeliveryInfo(@RequestBody DeliveryInformation deliveryInfo) {
         return deliveryInfoService.addDeliveryInfo(deliveryInfo);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DeliveryInfo> updateDeliveryInfo(@PathVariable int id, @RequestBody DeliveryInfo deliveryInfo) {
-        DeliveryInfo updatedDeliveryInfo = deliveryInfoService.updateDeliveryInfo(id, deliveryInfo);
+    public ResponseEntity<DeliveryInformation> updateDeliveryInfo(@PathVariable int id, @RequestBody DeliveryInformation deliveryInfo) {
+        DeliveryInformation updatedDeliveryInfo = deliveryInfoService.updateDeliveryInfo(id, deliveryInfo);
         if (updatedDeliveryInfo != null) {
             return ResponseEntity.ok(updatedDeliveryInfo);
         } else {
@@ -41,7 +47,7 @@ public class DeliveryInfoController {
         return ResponseEntity.noContent().build();
     }
     @GetMapping("/user/{userId}")
-    public List<DeliveryInfo> getDeliveryInfoByUserId(@PathVariable int userId) {
+    public List<DeliveryInformation> getDeliveryInfoByUserId(@PathVariable int userId) {
         return deliveryInfoService.getAllDeliveryInfoByUserId(userId);
     }
 }

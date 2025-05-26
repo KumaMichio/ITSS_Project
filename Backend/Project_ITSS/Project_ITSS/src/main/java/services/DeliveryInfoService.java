@@ -38,7 +38,7 @@ public class DeliveryInfoService implements IDeliveryInfoService{
             updatedDeliveryInfo.setAddress(deliveryInfo.getAddress());
             updatedDeliveryInfo.setProvince(deliveryInfo.getProvince());
             updatedDeliveryInfo.setInstruction(deliveryInfo.getInstruction());
-            updatedDeliveryInfo.setUserId(deliveryInfo.getUserId());
+            updatedDeliveryInfo.setUser(deliveryInfo.getUser());
             return deliveryInfoRepository.save(updatedDeliveryInfo);
         }
         return null;
@@ -55,7 +55,7 @@ public class DeliveryInfoService implements IDeliveryInfoService{
     @Override
     public List<DeliveryInformation> getAllDeliveryInfoByUserId(int userId) {
         return deliveryInfoRepository.findAll().stream()
-                .filter(deliveryInfo -> deliveryInfo.getUserId() == userId)
+                .filter(deliveryInfo -> deliveryInfo.getUser().getUserId() == userId)
                 .toList();
     }
 
