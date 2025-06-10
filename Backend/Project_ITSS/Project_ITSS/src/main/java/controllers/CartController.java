@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/api/cart") // localhost::8801/api/cart
 public class CartController {
     @Autowired
     private CartService cartService;
