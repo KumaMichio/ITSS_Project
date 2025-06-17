@@ -14,3 +14,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+  vnpay:
+    tmnCode: ZAVGV1VT
+    hashSecret: OR92SDL9CRPL5TOXFICMKRVASZ4FXJ4M
+    pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    return-url: http://localhost:8080/api/v1/payment/vn-pay-callback
+    api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
