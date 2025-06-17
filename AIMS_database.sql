@@ -1,5 +1,5 @@
-
-
+-- This SQL script creates a database schema for an e-commerce application - AIMS
+-- It includes tables for users, products, orders, order items, shipping methods, delivery information, and transaction information.
 CREATE TABLE products(
   id INT PRIMARY KEY AUTO_INCREMENT,
   title VARCHAR(350) COMMENT 'Tên sản phẩm',
@@ -9,8 +9,12 @@ CREATE TABLE products(
   quantity INT CHECK (quantity >= 0),
   entry_date DATE,
   dimension DOUBLE,
-  `weight` DOUBLE
+  `weight` DOUBLE,
+  user_id INT,
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
+
 
 CREATE TABLE shippingmethod (
   method_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -19,26 +23,26 @@ CREATE TABLE shippingmethod (
   shipping_fees DOUBLE
 );
 
-CREATE TABLE deliveryinformation (
-  delivery_id INT PRIMARY KEY,
-  shipping_method_id INT,
-  recipient_name VARCHAR(255),
-  email VARCHAR(255),
-  phone VARCHAR(15),
-  address VARCHAR(255),
-  province VARCHAR(255),
-  shipping_fee DOUBLE,
-  instruction VARCHAR(255),
-  FOREIGN KEY (shipping_method_id) REFERENCES shippingmethod(method_id)
-);
+CREATE TABLE delivery_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,             
+    `name` VARCHAR(255) NOT NULL,                    
+    phone VARCHAR(15) NOT NULL,                    
+    `address` VARCHAR(500) NOT NULL,                 
+    province VARCHAR(100),                         
+    instruction VARCHAR(500),                      
+    user_id INT NOT NULL,                          
+    FOREIGN KEY (user_id) REFERENCES users(id)    
+)
 
 CREATE TABLE transactioninformation (
   transaction_id INT PRIMARY KEY,
   order_id INT,
   total_fee DOUBLE,
-  status VARCHAR(255),
+  `status` VARCHAR(255),
   transaction_time DATETIME,
-  content VARCHAR(255)
+  content VARCHAR(255),
+  payment_method VARCHAR(255),
+  FOREIGN KEY (order_id) REFERENCES orders (order_id)
 );
 
 CREATE TABLE books(
@@ -76,40 +80,41 @@ CREATE TABLE dvds(
 CREATE TABLE users(
   user_id INT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(255),
-  email VARCHAR(255)
+  email VARCHAR(255),
+  `role` VARCHAR(100),
+  `password` text
 );
+
+insert into product (title, price, category, image_url, quantity, entry_date, dimension, weight, seller_id)
+values('Dewewew',156000, 'Book', 'dddddđd', 123,'2024-06-08', 12, 1, 2);
 
 CREATE TABLE orders(
   order_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT,
   delivery_id INT,
   transaction_id INT,
+  method_id INT,
   shipping_fees DOUBLE,
   total_amount DOUBLE,
   created_at DATETIME,
   VAT INT,
   totalFees DOUBLE,
   FOREIGN KEY (user_id) REFERENCES users (user_id),
-  FOREIGN KEY (delivery_id) REFERENCES deliveryinformation (delivery_id),
-  FOREIGN KEY (transaction_id) REFERENCES transactioninformation (transaction_id)
+  FOREIGN KEY (delivery_id) REFERENCES delivery_info (id),
+  FOREIGN KEY (transaction_id) REFERENCES transactioninformation (transaction_id),
+  FOREIGN KEY (method_id) REFERENCES shippingmethod (method_id)
 );
 
 CREATE TABLE orderitem (
-  order_item_id INT PRIMARY KEY AUTO_INCREMENT,
+  id INT PRIMARY KEY AUTO_INCREMENT,
   order_id INT,
   product_id INT,
   quantity INT,
-  unit_price DOUBLE,
+  price DOUBLE,
   FOREIGN KEY (order_id) REFERENCES orders(order_id),
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
-CREATE TABLE `orderitem_order` (
-  `orderitem_order_id` int,
-  `order_order_id` int,
-  PRIMARY KEY (`orderitem_order_id`, `order_order_id`)
-);
-
-ALTER TABLE `orderitem_order` ADD FOREIGN KEY (`orderitem_order_id`) REFERENCES `orderitem` (`order_id`);
-
-ALTER TABLE `orderitem_order` ADD FOREIGN KEY (`order_order_id`) REFERENCES `orders` (`order_id`);
+-- Insert initial data into shippingmethod table
+INSERT INTO shippingmethod(`name`, `shipping_fees`) VALUES ('Regular', 25000);
+INSERT INTO shippingmethod(`name`, ` shipping_fees`) VALUES ('Rush', 0);
