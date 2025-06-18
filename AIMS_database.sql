@@ -126,13 +126,4 @@ ALTER TABLE transactioninformation
 ADD CONSTRAINT fk_transInfo_orders
 FOREIGN KEY (order_id) REFERENCES orders(order_id);
 
-INSERT INTO users (user_id, username, email, role, password)
-VALUES (2, 'demo_user', 'demo@example.com', 'seller', '123456');
 
-
-INSERT INTO products (title, price, category, imageURL, quantity, entry_date, dimension, `weight`, user_id)
-VALUES('Dewewew',156000, 'Book', 'dddddđd', 123,'2024-06-08', 12, 1, 2);
-
--- Insert initial data into shippingmethod table
-INSERT INTO shippingmethod(`method_name`, `shipping_fees`) VALUES ('Regular', 25000);
-INSERT INTO shippingmethod(`method_name`, `shipping_fees`) VALUES ('Rush', 0);
