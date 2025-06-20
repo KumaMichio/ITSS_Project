@@ -27,8 +27,13 @@ public class CartController {
     }
 
     @PostMapping
-    public OrderItem addOrderItem(@RequestBody OrderItem orderProduct) {
-        return cartService.addOrderItem(orderProduct);
+    public ResponseEntity<OrderItem> addOrderItem(@RequestBody OrderItem orderProduct) {
+        try {
+            OrderItem result = cartService.addOrderItem(orderProduct);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/add")
@@ -57,8 +62,22 @@ public class CartController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrderProduct(@PathVariable int id) {
-        cartService.deleteOrderItem(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteOrderProduct(@PathVariable int id) {
+        try {
+            cartService.deleteOrderItem(id);
+            return ResponseEntity.ok("{\"message\":\"Item deleted successfully\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("{\"error\":\"Failed to delete item\"}");
+        }
+    }
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> clearCart() {
+        try {
+            cartService.clearCart();
+            return ResponseEntity.ok("{\"message\":\"Cart cleared successfully\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("{\"error\":\"Failed to clear cart\"}");
+        }
     }
 }

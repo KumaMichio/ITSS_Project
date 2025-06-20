@@ -4,6 +4,7 @@ import Home from "./views/Home/Home";
 import Checkout from "./views/Checkout/Checkout";
 import Cart from "./views/Cart/Cart";
 import Shop from "./views/Shop/Shop";
+import ProductDetail from "./views/Product/ProductDetail";
 import Login from "./views/Auth/Login";
 import Register from "./views/Auth/Register";
 import GuestOrderTest from "./views/Test/GuestOrderTest";
@@ -20,6 +21,7 @@ function App() {
           <div className="w-full min-h-screen bg-[#E5E5E5]">            <Router>              <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />

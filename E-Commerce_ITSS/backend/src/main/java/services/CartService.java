@@ -24,7 +24,6 @@ public class CartService implements ICartService {
         this.productRepository = productRepository;
     }
 
-
     private OrderItem applyProductPrice(OrderItem orderItem, Product product) {
         double totalPrice = product.getPrice() * orderItem.getQuantity();
         orderItem.setPrice(totalPrice);
@@ -43,31 +42,30 @@ public class CartService implements ICartService {
 
     @Override
     public OrderItem addOrderItem(OrderItem orderItem) {
-//        Optional<Product> productOpt = productRepository.findById(orderProduct.getProductId());
-//        if (productOpt.isPresent()) {
-//            Product product = productOpt.get();
-//            orderProduct.setPrice(product.getPrice() * orderProduct.getQuantity());
-//            return cartRepository.save(orderProduct);
-//        }
-//        return null;
-        Product product = productRepository.findById(orderItem.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        return cartRepository.save(applyProductPrice(orderItem, product));
+        try {
+            Product product = productRepository.findById(orderItem.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found with id: " + orderItem.getProductId()));
+            return cartRepository.save(applyProductPrice(orderItem, product));
+        } catch (Exception e) {
+            System.err.println("Error adding order item: " + e.getMessage());
+            throw e;
+        }
     }
 
     @Override
     public List<OrderItem> addOrderItems(List<OrderItem> orderItems) {
-//        List<OrderItem> returningOrderItems = new ArrayList<>();
-//        for (OrderItem orderItem : orderItems) {
-//            Optional<Product> productOpt = productRepository.findById(orderItem.getProductId());
-//            if (productOpt.isPresent()) {
-//                Product product = productOpt.get();
-//                orderItem.setPrice(product.getPrice() * orderItem.getQuantity());
-//                OrderItem op =  cartRepository.save(orderItem);
-//                returningOrderItems.add(op);
-//            }
-//        }
-//        return returningOrderItems;
+        // List<OrderItem> returningOrderItems = new ArrayList<>();
+        // for (OrderItem orderItem : orderItems) {
+        // Optional<Product> productOpt =
+        // productRepository.findById(orderItem.getProductId());
+        // if (productOpt.isPresent()) {
+        // Product product = productOpt.get();
+        // orderItem.setPrice(product.getPrice() * orderItem.getQuantity());
+        // OrderItem op = cartRepository.save(orderItem);
+        // returningOrderItems.add(op);
+        // }
+        // }
+        // return returningOrderItems;
         return orderItems.stream()
                 .map(op -> productRepository.findById(op.getProductId())
                         .map(product -> cartRepository.save(applyProductPrice(op, product)))
@@ -78,18 +76,19 @@ public class CartService implements ICartService {
 
     @Override
     public OrderItem updateOrderItem(int id, OrderItem orderItem) {
-//        Optional<OrderItem> existingOrderProductOpt = cartRepository.findById(id);
-//        if (existingOrderProductOpt.isPresent()) {
-//            OrderItem existingOrderProduct = existingOrderProductOpt.get();
-//            Optional<Product> productOpt = productRepository.findById(orderItem.getProductId());
-//            if (productOpt.isPresent()) {
-//                Product product = productOpt.get();
-//                existingOrderProduct.setQuantity(orderItem.getQuantity());
-//                existingOrderProduct.setPrice(product.getPrice() * orderItem.getQuantity());
-//                return cartRepository.save(existingOrderProduct);
-//            }
-//        }
-//        return null;
+        // Optional<OrderItem> existingOrderProductOpt = cartRepository.findById(id);
+        // if (existingOrderProductOpt.isPresent()) {
+        // OrderItem existingOrderProduct = existingOrderProductOpt.get();
+        // Optional<Product> productOpt =
+        // productRepository.findById(orderItem.getProductId());
+        // if (productOpt.isPresent()) {
+        // Product product = productOpt.get();
+        // existingOrderProduct.setQuantity(orderItem.getQuantity());
+        // existingOrderProduct.setPrice(product.getPrice() * orderItem.getQuantity());
+        // return cartRepository.save(existingOrderProduct);
+        // }
+        // }
+        // return null;
         OrderItem existingOrderItem = cartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order product not found"));
 
@@ -110,5 +109,10 @@ public class CartService implements ICartService {
     @Override
     public void deleteOrderItem(int id) {
         cartRepository.deleteById(id);
+    }
+
+    @Override
+    public void clearCart() {
+        cartRepository.deleteAll();
     }
 }

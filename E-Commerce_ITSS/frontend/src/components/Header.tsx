@@ -1,19 +1,27 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
 import logo from "../img/logo.png";
 
 const Header = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
     const { totalItems } = useCart();
+    const [searchQuery, setSearchQuery] = useState("");
 
-    const isActive = (path: string) => location.pathname === path;
-
-    const handleLogout = () => {
+    const isActive = (path: string) => location.pathname === path; const handleLogout = () => {
         logout();
         // Optionally redirect to home
         window.location.href = '/';
+    };
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+        }
     };
 
     return (
@@ -21,6 +29,25 @@ const Header = () => {
             <Link to="/">
                 <img src={logo} className="h-12" alt="logo" />
             </Link>
+
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="flex items-center flex-1 max-w-md mx-8">
+                <div className="relative w-full">
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm sản phẩm..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#088178] focus:border-transparent"
+                    />
+                    <button
+                        type="submit"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[#088178] transition"
+                    >
+                        <i className="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
 
             <ul className="flex items-center space-x-6 font-semibold">
                 <li>

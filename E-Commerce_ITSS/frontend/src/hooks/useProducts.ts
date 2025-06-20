@@ -179,12 +179,96 @@ export const useProductSearch = (query: string) => {
         }, 300); // Debounce search by 300ms
 
         return () => clearTimeout(debounceTimer);
-    }, [query]);
+    }, [query]); return {
+        products,
+        loading,
+        error,
+        search: searchProducts
+    };
+};
+
+// Hook to get all categories
+export const useCategories = () => {
+    const [categories, setCategories] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchCategories = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await productService.getAllCategories();
+
+            if (response.success && response.data) {
+                setCategories(response.data);
+            } else {
+                // Fallback to mock categories
+                const mockCategories = Array.from(new Set(mockProducts.map(p => p.category)));
+                setCategories(mockCategories);
+                setError(null);
+            }
+        } catch (err) {
+            console.warn('Failed to fetch categories, using mock data:', err);
+            const mockCategories = Array.from(new Set(mockProducts.map(p => p.category)));
+            setCategories(mockCategories);
+            setError(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    return {
+        categories,
+        loading,
+        error,
+        refetch: fetchCategories
+    };
+};
+
+// Hook to get random products
+export const useRandomProducts = (limit: number = 20) => {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchRandomProducts = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await productService.getRandomProducts(limit);
+
+            if (response.success && response.data) {
+                setProducts(response.data);
+            } else {
+                // Fallback to shuffled mock data
+                const shuffled = [...mockProducts].sort(() => 0.5 - Math.random());
+                setProducts(shuffled.slice(0, limit));
+                setError(null);
+            }
+        } catch (err) {
+            console.warn('Failed to fetch random products, using mock data:', err);
+            const shuffled = [...mockProducts].sort(() => 0.5 - Math.random());
+            setProducts(shuffled.slice(0, limit));
+            setError(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchRandomProducts();
+    }, [limit]);
 
     return {
         products,
         loading,
         error,
-        search: searchProducts
+        refetch: fetchRandomProducts
     };
 };

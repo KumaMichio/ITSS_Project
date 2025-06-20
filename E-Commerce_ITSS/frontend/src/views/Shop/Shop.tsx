@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "../../components/Header";
 import FeatureBox from "../../components/FeatureBox";
 import ProductCard from "../../components/ProductCard";
 import Loading from "../../components/Loading";
 import { useProducts, useProductsByCategory } from "../../hooks/useProducts";
+import { productService } from "../../services/product.service";
+import type { Product } from "../../types";
 
 // Import images
 import f2Feature from "../../img/features/f2.png";
@@ -18,17 +21,69 @@ const features = [
 
 const Shop = () => {
     const [filter, setFilter] = useState<string | null>(null);
+    const [searchParams] = useSearchParams();
+    const [searchResults, setSearchResults] = useState<Product[]>([]);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState<string>("");
+    const searchQuery = searchParams.get('search');
 
     // Use different hooks based on filter
     const { products: allProducts, loading: loadingAll, error: errorAll } = useProducts();
     const { products: filteredProducts, loading: loadingFiltered, error: errorFiltered } = useProductsByCategory(filter || '');
 
-    // Determine which data to use
-    const products = filter ? filteredProducts : allProducts;
-    const loading = filter ? loadingFiltered : loadingAll;
-    const error = filter ? errorFiltered : errorAll;
+    // Search for products when searchQuery changes
+    useEffect(() => {
+        if (searchQuery) {
+            searchProducts(searchQuery);
+        } else {
+            setSearchResults([]);
+            setSearchError("");
+        }
+    }, [searchQuery]);
 
-    const handleFilterChange = (categoryType: string) => {
+    const searchProducts = async (query: string) => {
+        setSearchLoading(true);
+        setSearchError("");
+        try {
+            const response = await productService.searchProducts(query);
+            if (response.success && response.data) {
+                setSearchResults(response.data);
+            } else {
+                setSearchError(response.error || "Không thể tìm kiếm sản phẩm");
+                setSearchResults([]);
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            setSearchError("Lỗi khi tìm kiếm sản phẩm");
+            setSearchResults([]);
+        } finally {
+            setSearchLoading(false);
+        }
+    };
+
+    // Determine which data to use
+    let products, loading, error, title;
+
+    if (searchQuery) {
+        products = searchResults;
+        loading = searchLoading;
+        error = searchError;
+        title = `Kết quả tìm kiếm: "${searchQuery}"`;
+    } else if (filter) {
+        products = filteredProducts;
+        loading = loadingFiltered;
+        error = errorFiltered;
+        title = `Shop ${filter}`;
+    } else {
+        products = allProducts;
+        loading = loadingAll;
+        error = errorAll;
+        title = 'Shop All';
+    } const handleFilterChange = (categoryType: string) => {
+        if (searchQuery) {
+            // Clear search when filtering by category
+            window.location.href = '/shop';
+        }
         setFilter(filter === categoryType ? null : categoryType);
     };
 
@@ -53,9 +108,8 @@ const Shop = () => {
 
     return (
         <>
-            <Header />
-            <section className="flex flex-wrap items-center justify-between px-20 py-10 gap-4">
-                {features.map((feature, index) => (
+            <Header />            <section className="flex flex-wrap items-center justify-between px-20 py-10 gap-4">
+                {!searchQuery && features.map((feature, index) => (
                     <FeatureBox
                         key={index}
                         img={feature.img}
@@ -69,9 +123,11 @@ const Shop = () => {
 
             <section className="text-center px-20">
                 <h2 className="text-3xl font-bold mb-2">
-                    {filter ? `Shop ${filter}` : 'Shop All'}
+                    {title}
                 </h2>
-                <p className="text-xs text-gray-500 mb-4">Collection</p>                {loading ? (
+                <p className="text-xs text-gray-500 mb-4">
+                    {searchQuery ? `${products.length} sản phẩm được tìm thấy` : 'Collection'}
+                </p>{loading ? (
                     <Loading message="Đang tải sản phẩm..." />
                 ) : (
                     <div className="flex flex-wrap justify-between gap-5 border border-[#cce7d0] rounded-2xl p-4 shadow mb-4">
@@ -81,12 +137,24 @@ const Shop = () => {
                                     key={product.id}
                                     product={product}
                                 />
-                            ))
-                        ) : (
+                            ))) : (
                             <div className="w-full text-center py-20">
                                 <p className="text-gray-500">
-                                    {filter ? `Không có sản phẩm nào trong danh mục ${filter}` : 'Không có sản phẩm nào'}
+                                    {searchQuery
+                                        ? `Không tìm thấy sản phẩm nào cho "${searchQuery}"`
+                                        : filter
+                                            ? `Không có sản phẩm nào trong danh mục ${filter}`
+                                            : 'Không có sản phẩm nào'
+                                    }
                                 </p>
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => window.location.href = '/shop'}
+                                        className="mt-4 bg-[#088178] text-white px-4 py-2 rounded hover:bg-[#066e6a] transition"
+                                    >
+                                        Xem tất cả sản phẩm
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>

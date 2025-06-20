@@ -25,10 +25,12 @@ export class CartService {
 
     async updateOrderItemId(orderProductIds: number[], id: number) {
         return apiService.put<string>(API_ENDPOINTS.CART.UPDATE_ORDER(id), orderProductIds);
+    } async deleteOrderItem(id: number) {
+        return apiService.delete<void>(API_ENDPOINTS.CART.DELETE(id));
     }
 
-    async deleteOrderItem(id: number) {
-        return apiService.delete<void>(API_ENDPOINTS.CART.DELETE(id));
+    async clearCart() {
+        return apiService.delete<void>(API_ENDPOINTS.CART.CLEAR);
     }
 
     // Local cart management (if backend cart is not available)

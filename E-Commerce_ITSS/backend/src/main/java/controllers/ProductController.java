@@ -18,53 +18,68 @@ import java.util.List;
 @RequestMapping("api/products")
 public class ProductController {
 
-//    @Autowired
-//    private ProductService productService;
-//
-//    @Autowired
-//    private DVDService dvdService;
+    // @Autowired
+    // private ProductService productService;
+    //
+    // @Autowired
+    // private DVDService dvdService;
 
     private final ProductService productService;
     private final DVDService dvdService;
     private final BookService bookService;
     private final CDLPService cdlpService;
 
-    //--------------------------------------------------------------------------------------------------
-    //Products
+    // --------------------------------------------------------------------------------------------------
+    // Products
 
     @PostMapping("/add-product")
-    public Product createProduct(@RequestBody Product product)
-    {
-//        Product savedProduct = productService.addProduct(product);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+    public Product createProduct(@RequestBody Product product) {
+        // Product savedProduct = productService.addProduct(product);
+        // return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
         return productService.insertProduct(product);
     }
 
-    //get all product
+    // get all product
     @GetMapping
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public Product getProduct(@PathVariable int id){
+    public Product getProduct(@PathVariable int id) {
         return productService.getProductById(id);
-    }
+    } // get product by title containing
 
-    //get product by title containing
     @GetMapping("/search/{title}")
     public List<Product> getProductByTitleContaining(@PathVariable String title) {
         return productService.getProductByTitleContaining(title);
     }
 
+    // get products by category
+    @GetMapping("/category/{category}")
+    public List<Product> getProductsByCategory(@PathVariable String category) {
+        return productService.getProductsByCategory(category);
+    }
 
-//    @GetMapping("")
-//    public ResponseEntity<String> getProducts(
-//            @RequestParam("page")   int page,
-//            @RequestParam("limit")  int limit
-//    ) {
-//        return ResponseEntity.ok("getProducts here");
-//    }
+    // get all categories
+    @GetMapping("/categories")
+    public List<String> getAllCategories() {
+        return productService.getAllCategories();
+    }
+
+    // get random products
+    @GetMapping("/random")
+    public List<Product> getRandomProducts(@RequestParam(defaultValue = "20") int limit) {
+        return productService.getRandomProducts(limit);
+    }
+
+    // @GetMapping("")
+    // public ResponseEntity<String> getProducts(
+    // @RequestParam("page") int page,
+    // @RequestParam("limit") int limit
+    // ) {
+    // return ResponseEntity.ok("getProducts here");
+    // }
 
     @PutMapping("/modify/{id}")
     public Product updateProduct(@PathVariable int id, @RequestBody Product product) {
@@ -76,11 +91,11 @@ public class ProductController {
         productService.deleteProduct(id);
     }
 
-    //--------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
     // Books
 
     @PostMapping("/add-product/books")
-    public void createProduct(@RequestBody Book book){
+    public void createProduct(@RequestBody Book book) {
         bookService.addBook(book);
     }
 
@@ -90,7 +105,7 @@ public class ProductController {
     }
 
     @GetMapping("/book/search/{title}")
-    public List<Book> getBoookByTitleContaining(@PathVariable String title){
+    public List<Book> getBoookByTitleContaining(@PathVariable String title) {
         return bookService.getBookByTitleContaining(title);
     }
 
@@ -114,7 +129,7 @@ public class ProductController {
         bookService.deleteAllBooks();
     }
 
-    //---------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------
     // CDLPs
 
     @PostMapping("/add-product/cdlp")
@@ -152,7 +167,7 @@ public class ProductController {
         cdlpService.deleteAllCDLPs();
     }
 
-    //----------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // DVDs
 
     @PostMapping("/add-product/dvd")

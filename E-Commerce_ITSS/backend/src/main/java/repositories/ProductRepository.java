@@ -2,8 +2,6 @@ package repositories;
 
 import jakarta.transaction.Transactional;
 import models.Product;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,9 +17,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Modifying
     @Transactional
     @Query(value = """
-        INSERT INTO products (title, price, category, imageURL, quantity, entry_date, dimension, weight, user_id)
-        VALUES (:title, :price, :category, :imageUrl, :quantity, :entryDate, :dimension, :weight, :sellerId)
-        """, nativeQuery = true)
+            INSERT INTO products (title, price, category, imageURL, quantity, entry_date, dimension, weight, user_id)
+            VALUES (:title, :price, :category, :imageUrl, :quantity, :entryDate, :dimension, :weight, :sellerId)
+            """, nativeQuery = true)
     void customInsert(
             @Param("title") String title,
             @Param("price") double price,
@@ -31,10 +29,14 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             @Param("entryDate") LocalDate entryDate,
             @Param("dimension") double dimension,
             @Param("weight") double weight,
-            @Param("sellerId") int sellerId
-    );
+            @Param("sellerId") int sellerId);
 
     List<Product> findByTitleContaining(String title);
+
+    List<Product> findByCategory(String category);
+
+    @Query("SELECT DISTINCT p.category FROM Product p WHERE p.category IS NOT NULL")
+    List<String> findDistinctCategories();
 
     // Page<Product> findAll(Pageable pageable);
 

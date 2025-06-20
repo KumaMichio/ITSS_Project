@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import type { Product } from "../types";
 
@@ -68,21 +69,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, stars = 5 }) => {
                     <i className="fas fa-check-circle mr-1"></i>
                     Đã thêm vào giỏ hàng!
                 </div>
-            )}
-
-            <img
+            )}            <img
                 src={getImageUrl(product.imageURL)}
                 alt={product.title}
-                className="w-full h-72 object-cover rounded-xl mb-2" onError={(e) => {
+                className="w-full h-72 object-cover rounded-xl mb-2 cursor-pointer hover:scale-105 transition-transform" onError={(e) => {
                     // Fallback to a default image if the product image fails to load
                     (e.target as HTMLImageElement).src = '/default-product.svg';
                 }}
+                onClick={() => window.location.href = `/product/${product.id}`}
             />
             <div className="text-center py-2">
                 <span className="text-xs text-gray-500">{product.category}</span>
-                <h5 className="pt-2 text-base font-semibold text-[#1a1a1a] line-clamp-2" title={product.title}>
-                    {product.title}
-                </h5>
+                <Link to={`/product/${product.id}`}>
+                    <h5 className="pt-2 text-base font-semibold text-[#1a1a1a] line-clamp-2 hover:text-[#088178] transition cursor-pointer" title={product.title}>
+                        {product.title}
+                    </h5>
+                </Link>
                 <div className="flex justify-center gap-1 mt-1">
                     {[...Array(5)].map((_, i) => (
                         <i key={i} className={`fas fa-star text-xs ${i < stars ? 'text-yellow-400' : 'text-gray-300'}`}></i>

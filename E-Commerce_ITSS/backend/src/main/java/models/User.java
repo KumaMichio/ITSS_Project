@@ -1,7 +1,7 @@
 package models;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import jakarta.persistence.*;
 
@@ -20,6 +20,7 @@ public class User {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("userId")
     private int id;
 
     private String username;
@@ -28,6 +29,7 @@ public class User {
 
     private String role;
 
+    @JsonIgnore
     private String password;
 
     @OneToMany(mappedBy = "sellerId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

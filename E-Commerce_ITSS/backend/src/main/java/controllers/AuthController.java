@@ -1,17 +1,13 @@
 package controllers;
 
 import jakarta.validation.Valid;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import models.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,8 +22,6 @@ import response.AuthResponse;
 import response.BasicResponse;
 import security.JwtTokenProvider;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
@@ -38,13 +32,15 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-//    @Autowired
-//    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
-//        this.authenticationManager = authenticationManager;
-//        this.userRepository = userRepository;
-//        this.passwordEncoder = passwordEncoder;
-//        this.jwtTokenProvider = jwtTokenProvider;
-//    }
+    // @Autowired
+    // public AuthController(AuthenticationManager authenticationManager,
+    // UserRepository userRepository, PasswordEncoder passwordEncoder,
+    // JwtTokenProvider jwtTokenProvider) {
+    // this.authenticationManager = authenticationManager;
+    // this.userRepository = userRepository;
+    // this.passwordEncoder = passwordEncoder;
+    // this.jwtTokenProvider = jwtTokenProvider;
+    // }
 
     @PostMapping(value = "signup")
     public BasicResponse signup(@RequestBody RegisterRequest registerRequest) {
@@ -63,15 +59,18 @@ public class AuthController {
     @PostMapping("login")
     public AuthResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtTokenProvider.generateToken(authentication);
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList();
-            List<String> infos = List.of(roles.get(0).split("\\|"));
-            return new AuthResponse(token, infos.get(0), infos.get(1), Integer.parseInt(infos.get(2)));
+
+            // Get the user from database
+            User user = userRepository.findByUsername(loginRequest.getUsername());
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            }
+
+            return new AuthResponse(token, user);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid username or password");
         }

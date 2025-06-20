@@ -13,10 +13,20 @@ export class ProductService {
 
     async getProductById(id: number) {
         return apiService.get<Product>(API_ENDPOINTS.PRODUCTS.BY_ID(id));
+    } async searchProducts(title: string) {
+        return apiService.get<Product[]>(API_ENDPOINTS.PRODUCTS.SEARCH(title));
     }
 
-    async searchProducts(title: string) {
-        return apiService.get<Product[]>(API_ENDPOINTS.PRODUCTS.SEARCH(title));
+    async getProductsByCategory(category: string) {
+        return apiService.get<Product[]>(API_ENDPOINTS.PRODUCTS.BY_CATEGORY(category));
+    }
+
+    async getAllCategories() {
+        return apiService.get<string[]>(API_ENDPOINTS.PRODUCTS.CATEGORIES);
+    }
+
+    async getRandomProducts(limit: number = 20) {
+        return apiService.get<Product[]>(`${API_ENDPOINTS.PRODUCTS.RANDOM}?limit=${limit}`);
     }
 
     async createProduct(product: Omit<Product, 'id'>) {

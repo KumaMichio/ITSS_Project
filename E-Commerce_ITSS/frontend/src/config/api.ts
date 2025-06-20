@@ -7,13 +7,14 @@ export const API_ENDPOINTS = {
         REGISTER: '/api/auth/signup', // Updated to match backend endpoint
         LOGOUT: '/api/auth/logout',
         CHANGE_PASSWORD: '/api/auth/change-password'
-    },
-
-    // Products
+    },    // Products
     PRODUCTS: {
         BASE: '/api/products',
         BY_ID: (id: number) => `/api/products/${id}`,
         SEARCH: (title: string) => `/api/products/search/${encodeURIComponent(title)}`,
+        BY_CATEGORY: (category: string) => `/api/products/category/${encodeURIComponent(category)}`,
+        CATEGORIES: '/api/products/categories',
+        RANDOM: '/api/products/random',
         // Books
         BOOKS: {
             BASE: '/api/products/books',
@@ -90,8 +91,9 @@ export const API_ENDPOINTS = {
         ADD_MULTIPLE: '/api/cart/add',
         UPDATE: (id: number) => `/api/cart/${id}`,
         UPDATE_ORDER: (id: number) => `/api/cart/order/${id}`,
-        DELETE: (id: number) => `/api/cart/${id}`
-    },    // Payment - Updated to match new VNPayController endpoints
+        DELETE: (id: number) => `/api/cart/${id}`,
+        CLEAR: '/api/cart/clear'
+    },// Payment - Updated to match new VNPayController endpoints
     PAYMENT: {
         VNPAY: '/api/payment/vnpay',
         VNPAY_ORDER: (orderId: number) => `/api/payment/vnpay/order/${orderId}`,

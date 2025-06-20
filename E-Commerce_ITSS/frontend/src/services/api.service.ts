@@ -12,25 +12,41 @@ class ApiService {
     ): Promise<ApiResponse<T>> {
         try {
             const url = `${this.baseURL}${endpoint}`;
+
+            // Don't include auth headers for auth endpoints
+            const includeAuth = !endpoint.includes('/api/auth/');
+
             const config: RequestInit = {
-                headers: getHeaders(),
+                headers: getHeaders(includeAuth),
                 ...options,
             };
 
             console.log('API Request:', { url, config });
 
-            const response = await fetch(url, config);
+            const response = await fetch(url, config); console.log('API Response:', { status: response.status, statusText: response.statusText });
 
-            console.log('API Response:', { status: response.status, statusText: response.statusText });
+            // Check if response has content
+            let data = null;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const text = await response.text();
+                if (text.trim()) {
+                    try {
+                        data = JSON.parse(text);
+                    } catch (error) {
+                        console.error('Failed to parse JSON:', error);
+                        data = null;
+                    }
+                }
+            }
 
-            const data = await response.json();
             console.log('API Response Data:', data);
 
             if (!response.ok) {
                 return {
                     success: false,
                     data: null as T,
-                    error: data.error || data.message || `HTTP ${response.status}: ${response.statusText}`,
+                    error: data?.error || data?.message || `HTTP ${response.status}: ${response.statusText}`,
                 };
             }
 

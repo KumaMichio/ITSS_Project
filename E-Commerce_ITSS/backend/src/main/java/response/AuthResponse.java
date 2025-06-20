@@ -1,23 +1,15 @@
 package response;
 
 import lombok.Data;
+import models.User;
 
 @Data
 public class AuthResponse {
-    private String accessToken;
-    private String tokenType;
-    private String role;
-    private String email;
-    private int id;
+    private String token;
+    private User user;
 
-    public AuthResponse(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public AuthResponse(String accessToken, String role, String email, int id) {
-        this.accessToken = accessToken;
-        this.role = role;
-        this.email = email;
-        this.id = id;
+    public AuthResponse(String token, User user) {
+        this.token = token;
+        this.user = user;
     }
 }

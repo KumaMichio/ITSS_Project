@@ -46,26 +46,61 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             if (isAuthenticated) {
                 // Load cart from backend
                 const response = await cartService.getAllOrderItems();
-                if (response.success && response.data) {
-                    // Convert backend order items to cart items format
-                    const cartItems: CartItem[] = response.data.map((item: any) => ({
-                        productId: item.productId,
-                        quantity: item.quantity,
-                        product: {
-                            id: item.productId,
-                            price: item.price / item.quantity, // Calculate unit price
-                            // Add other product properties as needed
-                        } as Product
-                    }));
-                    setItems(cartItems);
+                if (response.success && response.data) {                    // Convert backend order items to cart items format with full product info
+                    const cartItemPromises = response.data.map(async (item: any): Promise<CartItem | null> => {
+                        try {
+                            // Get full product information
+                            const productResponse = await productService.getProductById(item.productId);
+                            const product = productResponse.success && productResponse.data
+                                ? productResponse.data
+                                : mockProducts.find(p => p.id === item.productId);
+
+                            if (!product) {
+                                console.warn(`Product with ID ${item.productId} not found`);
+                                return null;
+                            }
+
+                            return {
+                                productId: item.productId,
+                                quantity: item.quantity,
+                                product: product
+                            };
+                        } catch (error) {
+                            console.error(`Failed to load product ${item.productId}:`, error);
+                            // Try to use mock data as fallback
+                            const mockProduct = mockProducts.find(p => p.id === item.productId);
+                            if (mockProduct) {
+                                return {
+                                    productId: item.productId,
+                                    quantity: item.quantity,
+                                    product: mockProduct
+                                };
+                            }
+                            return null;
+                        }
+                    });
+
+                    const cartItemsResults = await Promise.all(cartItemPromises);
+
+                    // Filter out null items and set the cart
+                    const validCartItems = cartItemsResults.filter((item): item is CartItem => item !== null);
+                    setItems(validCartItems);
+                } else {
+                    // If backend fails, fall back to localStorage
+                    console.warn('Backend cart failed, using localStorage');
+                    const localCart = cartService.getLocalCart();
+                    setItems(localCart);
                 }
             } else {
-                // Load cart from localStorage
+                // Load cart from localStorage for guests
                 const localCart = cartService.getLocalCart();
                 setItems(localCart);
             }
         } catch (error) {
             console.error('Failed to load cart:', error);
+            // Fall back to localStorage
+            const localCart = cartService.getLocalCart();
+            setItems(localCart);
         } finally {
             setIsLoading(false);
         }
@@ -239,14 +274,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         } finally {
             setIsLoading(false);
         }
-    }; const clearCart = () => {
-        if (isAuthenticated) {
-            // Clear backend cart - would need API endpoint
-            console.log('Clear backend cart');
-        } else {
-            cartService.clearLocalCart();
+    }; const clearCart = async () => {
+        setIsLoading(true);
+        try {
+            if (isAuthenticated) {
+                // Clear backend cart
+                const response = await cartService.clearCart();
+                if (response.success) {
+                    setItems([]);
+                } else {
+                    console.error('Failed to clear backend cart');
+                }
+            } else {
+                // Clear local cart
+                cartService.clearLocalCart();
+                setItems([]);
+            }
+        } catch (error) {
+            console.error('Failed to clear cart:', error);
+        } finally {
+            setIsLoading(false);
         }
-        setItems([]);
     };
 
     const validateCartStock = async (): Promise<{ success: boolean; message?: string; invalidItems?: string[] }> => {
