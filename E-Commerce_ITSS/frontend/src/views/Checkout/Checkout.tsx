@@ -313,10 +313,20 @@ const Checkout = () => {
                     timestamp: Date.now(),
                     isFallback: isFallback || !backendHealthy
                 }));                // Extract payment URL from response
+                console.log('Payment response for URL extraction:', paymentResponse);
+                console.log('Payment response.data:', paymentResponse.data);
+                console.log('Payment response.data as any:', (paymentResponse.data as any)?.data);
+
                 let paymentUrl = null;
-                if (paymentResponse.data && paymentResponse.data.paymentUrl) {
+                // Check nested data structure first (backend response format)
+                if (paymentResponse.data && (paymentResponse.data as any).data && (paymentResponse.data as any).data.paymentUrl) {
+                    paymentUrl = (paymentResponse.data as any).data.paymentUrl;
+                } else if (paymentResponse.data && paymentResponse.data.paymentUrl) {
+                    // Fallback for direct response structure
                     paymentUrl = paymentResponse.data.paymentUrl;
                 }
+
+                console.log('Extracted payment URL:', paymentUrl);
 
                 if (paymentUrl) {
                     setTimeout(() => {

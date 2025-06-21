@@ -23,9 +23,14 @@ export default function Cart() {
         }
         return imageURL ? `/src/img/products/${imageURL}` : '/default-product.svg';
     }; const handleQuantityChange = async (productId: number, newQuantity: number) => {
+        console.log('Cart handleQuantityChange:', { productId, newQuantity });
+
         if (newQuantity >= 0) {
             setErrorMessage(""); // Clear previous error
+            console.log('Calling updateQuantity...');
             const result = await updateQuantity(productId, newQuantity);
+            console.log('updateQuantity result:', result);
+
             if (!result.success && result.message) {
                 setErrorMessage(result.message);
                 // Auto-hide error after 5 seconds
@@ -33,7 +38,10 @@ export default function Cart() {
             }
         }
     }; const handleRemoveItem = async (productId: number) => {
+        console.log('Cart handleRemoveItem:', { productId });
+        console.log('Calling removeFromCart...');
         await removeFromCart(productId);
+        console.log('removeFromCart completed');
     };
 
     const handleCheckout = async () => {

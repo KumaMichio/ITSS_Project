@@ -19,21 +19,20 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 # VNPay Sandbox Configuration
-payment:
-  vnPay:
-    # VNPay gateway URLs
-    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-    returnUrl: http://localhost:8080/api/payment/vn-pay-callback
-    # Merchant configuration - Updated with new sandbox credentials
-    tmnCode: ZAVGV1VT
-    secretKey: OR92SDL9CRPL5TOXFICMKRVASZ4FXJ4M
-    # API configuration
-    version: 2.1.0
-    command: pay
-    orderType: other
-    currCode: VND
-    locale: vn
-    # Refund API
-    apiUrl: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
-    # Timeout configuration (in minutes)
-    timeoutExpress: 15
+vnPay:
+  # VNPay gateway URLs
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  returnUrl: http://localhost:8080/api/payment/vn-pay-callback
+  # Merchant configuration - Updated with new sandbox credentials
+  tmnCode: ZAVGV1VT
+  secretKey: OR92SDL9CRPL5TOXFICMKRVASZ4FXJ4M
+  # API configuration
+  version: 2.1.0
+  command: pay
+  orderType: other
+  currCode: VND
+  locale: vn
+  # Refund API
+  apiUrl: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+  # Timeout configuration (in minutes)
+  timeoutExpress: 15

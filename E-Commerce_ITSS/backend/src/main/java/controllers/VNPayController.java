@@ -18,13 +18,13 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/payment")
 @CrossOrigin(origins = "*")
-public class VNPayController {
-
-    // VNPay Configuration - Sandbox Environment
+public class VNPayController { // VNPay Configuration - Sandbox Environment
     private static final String VNP_TMN_CODE = "ZAVGV1VT";
     private static final String VNP_SECRET_KEY = "OR92SDL9CRPL5TOXFICMKRVASZ4FXJ4M";
-    private static final String VNP_PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    // URL user return after payment - match frontend origin
+    private static final String VNP_PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; // URL user return
+                                                                                                    // after payment -
+                                                                                                    // match frontend
+                                                                                                    // origin
     private static final String VNP_RETURN_URL = "http://localhost:5174/transaction/success";
     private static final String VNP_VERSION = "2.1.0";
     private static final String VNP_COMMAND = "pay";
@@ -43,7 +43,7 @@ public class VNPayController {
             Long amount = requestData.get("amount") != null ? Long.valueOf(requestData.get("amount").toString())
                     : 100000L;
             String orderInfo = requestData.get("orderInfo") != null ? requestData.get("orderInfo").toString()
-                    : "Thanh toan don hang " + orderId;
+                    : "Payment for order " + orderId;
 
             // Create VNPay payment URL
             String paymentUrl = createVNPayPaymentUrl(orderId, amount, orderInfo, request);
@@ -163,9 +163,7 @@ public class VNPayController {
         String expireDate = formatter.format(calendar.getTime());
 
         // Get client IP address
-        String ipAddr = getClientIpAddress(request);
-
-        // Build parameters
+        String ipAddr = getClientIpAddress(request); // Build parameters
         Map<String, String> vnpParams = new TreeMap<>();
         vnpParams.put("vnp_Version", VNP_VERSION);
         vnpParams.put("vnp_Command", VNP_COMMAND);
@@ -180,13 +178,20 @@ public class VNPayController {
         vnpParams.put("vnp_IpAddr", ipAddr);
         vnpParams.put("vnp_CreateDate", createDate);
         vnpParams.put("vnp_ExpireDate", expireDate);
-        // Add SecureHashType as required by VNPay
-        vnpParams.put("vnp_SecureHashType", "HMACSHA512");
 
-        // Generate hash
+        System.out.println("VNPay Parameters: " + vnpParams);
+        System.out.println("Order ID: " + orderId + ", Amount: " + amount + ", TxnRef: " + txnRef); // Generate hash
+                                                                                                    // (IMPORTANT:
+                                                                                                    // vnp_SecureHashType
+                                                                                                    // is NOT included
+                                                                                                    // in hash
+                                                                                                    // calculation)
         String vnpSecureHash = generateVNPayHash(vnpParams);
 
-        // Build query string
+        // Add SecureHashType to params AFTER hash calculation for URL building
+        vnpParams.put("vnp_SecureHashType", "HMACSHA512");
+
+        // Build query string WITH URL ENCODING (only for final URL, not for hash)
         StringBuilder queryBuilder = new StringBuilder();
         for (Map.Entry<String, String> entry : vnpParams.entrySet()) {
             if (queryBuilder.length() > 0) {
@@ -196,10 +201,13 @@ public class VNPayController {
                     .append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.toString()));
         }
 
-        // Add secure hash
+        // Add secure hash (no encoding needed for hash itself)
         queryBuilder.append("&vnp_SecureHash=").append(vnpSecureHash);
 
-        return VNP_PAY_URL + "?" + queryBuilder.toString();
+        String finalUrl = VNP_PAY_URL + "?" + queryBuilder.toString();
+        System.out.println("Final VNPay URL: " + finalUrl.substring(0, Math.min(finalUrl.length(), 150)) + "...");
+
+        return finalUrl;
     }
 
     private String generateVNPayHash(Map<String, String> params) {
@@ -207,6 +215,8 @@ public class VNPayController {
             // Sort parameters by key
             List<String> sortedKeys = new ArrayList<>(params.keySet());
             Collections.sort(sortedKeys);
+
+            System.out.println("VNPay Hash Generation - Sorted Keys: " + sortedKeys);
 
             // Build hash data string
             StringBuilder hashData = new StringBuilder();
@@ -220,10 +230,17 @@ public class VNPayController {
                 }
             }
 
+            System.out.println("VNPay Hash Data String: " + hashData.toString());
+            System.out.println("VNPay Secret Key: " + VNP_SECRET_KEY);
+
             // Generate HMAC-SHA512 hash
-            return hmacSHA512(VNP_SECRET_KEY, hashData.toString());
+            String hash = hmacSHA512(VNP_SECRET_KEY, hashData.toString());
+            System.out.println("Generated VNPay Hash: " + hash);
+
+            return hash;
 
         } catch (Exception e) {
+            System.err.println("Error generating VNPay hash: " + e.getMessage());
             throw new RuntimeException("Error generating VNPay hash", e);
         }
     }
@@ -264,6 +281,11 @@ public class VNPayController {
         // If multiple IPs, get the first one
         if (ipAddress != null && ipAddress.contains(",")) {
             ipAddress = ipAddress.split(",")[0].trim();
+        }
+
+        // Convert IPv6 localhost to IPv4
+        if ("0:0:0:0:0:0:0:1".equals(ipAddress) || "::1".equals(ipAddress)) {
+            ipAddress = "127.0.0.1";
         }
 
         return ipAddress != null ? ipAddress : "127.0.0.1";

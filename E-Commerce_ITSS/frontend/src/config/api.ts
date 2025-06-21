@@ -1,3 +1,5 @@
+import { getCurrentTokenInfo } from '../utils/tokenUtils';
+
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export const API_ENDPOINTS = {
@@ -7,7 +9,9 @@ export const API_ENDPOINTS = {
         REGISTER: '/api/auth/signup', // Updated to match backend endpoint
         LOGOUT: '/api/auth/logout',
         CHANGE_PASSWORD: '/api/auth/change-password'
-    },    // Products
+    },
+
+    // Products
     PRODUCTS: {
         BASE: '/api/products',
         BY_ID: (id: number) => `/api/products/${id}`,
@@ -83,7 +87,7 @@ export const API_ENDPOINTS = {
         UPDATE_STATUS: (id: number) => `/order/status/${id}`
     },
 
-    // Cart    // Cart
+    // Cart
     CART: {
         BASE: '/api/cart',
         BY_ID: (id: number) => `/api/cart/${id}`,
@@ -93,7 +97,9 @@ export const API_ENDPOINTS = {
         UPDATE_ORDER: (id: number) => `/api/cart/order/${id}`,
         DELETE: (id: number) => `/api/cart/${id}`,
         CLEAR: '/api/cart/clear'
-    },// Payment - Updated to match new VNPayController endpoints
+    },
+
+    // Payment - Updated to match new VNPayController endpoints
     PAYMENT: {
         VNPAY: '/api/payment/vnpay',
         VNPAY_ORDER: (orderId: number) => `/api/payment/vnpay/order/${orderId}`,
@@ -122,9 +128,21 @@ export const getHeaders = (includeAuth = true) => {
     };
 
     if (includeAuth) {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+        const tokenInfo = getCurrentTokenInfo();
+        console.log('Token info for headers:', tokenInfo);
+
+        if (tokenInfo.hasToken && tokenInfo.isValid) {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+                console.log('Added valid token to headers');
+            }
+        } else if (tokenInfo.hasToken && !tokenInfo.isValid) {
+            console.warn('Token exists but is invalid/expired, not including in headers');
+            // Optionally clear expired token
+            // localStorage.removeItem('authToken');
+        } else {
+            console.log('No token found, not including auth headers');
         }
     }
 

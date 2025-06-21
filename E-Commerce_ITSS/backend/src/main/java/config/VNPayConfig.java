@@ -14,38 +14,38 @@ import java.util.TimeZone;
 @Configuration
 public class VNPayConfig {
     @Getter
-    @Value("${payment.vnPay.url}")
+    @Value("${vnPay.url}")
     private String vnp_PayUrl;
 
-    @Value("${payment.vnPay.returnUrl}")
+    @Value("${vnPay.returnUrl}")
     private String vnp_ReturnUrl;
 
-    @Value("${payment.vnPay.tmnCode}")
+    @Value("${vnPay.tmnCode}")
     private String vnp_TmnCode;
 
     @Getter
-    @Value("${payment.vnPay.secretKey}")
+    @Value("${vnPay.secretKey}")
     private String secretKey;
 
-    @Value("${payment.vnPay.version}")
+    @Value("${vnPay.version}")
     private String vnp_Version;
 
-    @Value("${payment.vnPay.command}")
+    @Value("${vnPay.command}")
     private String vnp_Command;
 
-    @Value("${payment.vnPay.orderType}")
+    @Value("${vnPay.orderType}")
     private String orderType;
 
-    @Value("${payment.vnPay.currCode}")
+    @Value("${vnPay.currCode}")
     private String currCode;
 
-    @Value("${payment.vnPay.locale}")
+    @Value("${vnPay.locale}")
     private String locale;
 
-    @Value("${payment.vnPay.apiUrl}")
+    @Value("${vnPay.apiUrl}")
     private String apiUrl;
 
-    @Value("${payment.vnPay.timeoutExpress}")
+    @Value("${vnPay.timeoutExpress}")
     private int timeoutExpress;
 
     public Map<String, String> getVNPayConfig(int orderId) {

@@ -13,26 +13,32 @@ import AdminPanel from "./views/Admin/AdminPanel";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import ErrorBoundary from "./components/ErrorBoundary";
+import DebugPanel from "./components/DebugPanel";
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <CartProvider>
-          <div className="w-full min-h-screen bg-[#E5E5E5]">            <Router>              <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/test-guest-order" element={<GuestOrderTest />} />
-            <Route path="/transaction/success" element={<TransactionResult />} />
-            <Route path="/transaction/fail" element={<TransactionResult />} />
-          </Routes>
-          </Router>
+          <div className="w-full min-h-screen bg-[#E5E5E5]">
+            <Router>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/test-guest-order" element={<GuestOrderTest />} />
+                <Route path="/transaction/success" element={<TransactionResult />} />
+                <Route path="/transaction/fail" element={<TransactionResult />} />
+              </Routes>
+            </Router>
+
+            {/* Debug Panel - only show in development */}
+            {import.meta.env.DEV && <DebugPanel />}
           </div>
         </CartProvider>
       </AuthProvider>

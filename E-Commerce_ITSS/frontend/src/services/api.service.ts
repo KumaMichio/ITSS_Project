@@ -21,9 +21,11 @@ class ApiService {
                 ...options,
             };
 
-            console.log('API Request:', { url, config });
+            console.log('API Request:', { url, method: config.method || 'GET', includeAuth });
 
-            const response = await fetch(url, config); console.log('API Response:', { status: response.status, statusText: response.statusText });
+            const response = await fetch(url, config);
+
+            console.log('API Response:', { url, status: response.status, statusText: response.statusText });
 
             // Check if response has content
             let data = null;
@@ -43,6 +45,13 @@ class ApiService {
             console.log('API Response Data:', data);
 
             if (!response.ok) {
+                // Handle 401 Unauthorized specifically
+                if (response.status === 401) {
+                    console.warn('401 Unauthorized - token may be expired or invalid');
+                    // Optionally clear token here if it's invalid
+                    // localStorage.removeItem('authToken');
+                }
+
                 return {
                     success: false,
                     data: null as T,
