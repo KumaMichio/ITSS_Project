@@ -20,7 +20,7 @@ const AdminPanel: React.FC = () => {
 
     if (user.role !== 'admin') {
         return <Navigate to="/" replace />;
-    }    const renderContent = () => {
+    } const renderContent = () => {
         switch (activeSection) {
             case 'dashboard':
                 return <AdminDashboard />;
@@ -35,7 +35,7 @@ const AdminPanel: React.FC = () => {
             default:
                 return <AdminDashboard />;
         }
-    };return (
+    }; return (
         <>
             <Header />
             <div className="flex min-h-screen bg-gray-100">

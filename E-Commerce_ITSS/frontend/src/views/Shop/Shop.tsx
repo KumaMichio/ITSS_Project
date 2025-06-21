@@ -14,9 +14,10 @@ import f3Feature from "../../img/features/f3.png";
 import f4Feature from "../../img/features/f4.png";
 
 const features = [
-    { type: "Books", label: "BOOK", img: f4Feature },
-    { type: "Music", label: "CD/LP", img: f3Feature },
-    { type: "Movies", label: "DVD", img: f2Feature },
+    { type: "Book", label: "BOOK", img: f4Feature },
+    { type: "CD", label: "CD", img: f3Feature },
+    { type: "DVD", label: "DVD", img: f2Feature },
+    { type: "CDLP", label: "CDLP", img: f3Feature },
 ];
 
 const Shop = () => {
@@ -59,10 +60,16 @@ const Shop = () => {
         } finally {
             setSearchLoading(false);
         }
-    };
-
-    // Determine which data to use
+    };    // Determine which data to use
     let products, loading, error, title;
+
+    console.log('Shop Debug:', {
+        searchQuery,
+        filter,
+        allProducts: allProducts?.length,
+        filteredProducts: filteredProducts?.length,
+        searchResults: searchResults?.length
+    });
 
     if (searchQuery) {
         products = searchResults;
@@ -80,11 +87,18 @@ const Shop = () => {
         error = errorAll;
         title = 'Shop All';
     } const handleFilterChange = (categoryType: string) => {
+        console.log('Filter change requested:', categoryType);
+        console.log('Current filter:', filter);
+
         if (searchQuery) {
             // Clear search when filtering by category
             window.location.href = '/shop';
+            return;
         }
-        setFilter(filter === categoryType ? null : categoryType);
+
+        const newFilter = filter === categoryType ? null : categoryType;
+        console.log('Setting new filter:', newFilter);
+        setFilter(newFilter);
     };
 
     if (error) {

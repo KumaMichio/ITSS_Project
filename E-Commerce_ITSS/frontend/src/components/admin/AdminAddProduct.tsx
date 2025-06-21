@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { productService } from '../../services/product.service';
 
-const AdminAddProduct: React.FC = () => {    const [formData, setFormData] = useState({
+const AdminAddProduct: React.FC = () => {
+    const [formData, setFormData] = useState({
         title: '',
         price: 0,
         category: '',
@@ -26,7 +27,7 @@ const AdminAddProduct: React.FC = () => {    const [formData, setFormData] = use
         setSuccess(null);
 
         try {
-            const response = await productService.createProduct(formData);            if (response.success) {
+            const response = await productService.createProduct(formData); if (response.success) {
                 setSuccess('Sản phẩm đã được thêm thành công!');
                 // Reset form
                 setFormData({
@@ -52,7 +53,7 @@ const AdminAddProduct: React.FC = () => {    const [formData, setFormData] = use
         } finally {
             setLoading(false);
         }
-    };    const handleReset = () => {
+    }; const handleReset = () => {
         setFormData({
             title: '',
             price: 0,

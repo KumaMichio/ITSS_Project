@@ -105,26 +105,35 @@ export const useProductsByCategory = (category: string) => {
     const [error, setError] = useState<string | null>(null);
 
     const fetchProducts = async () => {
-        if (!category) return;
+        if (!category) {
+            console.log('useProductsByCategory: No category provided, clearing products');
+            setProducts([]);
+            return;
+        }
 
+        console.log('useProductsByCategory: Fetching products for category:', category);
         setLoading(true);
         setError(null);
 
         try {
             const response = await productService.getProductsByCategory(category);
+            console.log('useProductsByCategory API Response:', response);
 
             if (response.success && response.data) {
+                console.log('useProductsByCategory: Setting products:', response.data.length, 'items');
                 setProducts(response.data);
             } else {
                 // Fallback to filtered mock data
                 console.warn('Backend not available, using filtered mock data');
                 const filteredMockProducts = mockProducts.filter(p => p.category === category);
+                console.log('useProductsByCategory: Mock products filtered:', filteredMockProducts.length, 'items');
                 setProducts(filteredMockProducts);
                 setError(null);
             }
         } catch (err) {
             console.warn('Failed to fetch from backend, using filtered mock data:', err);
             const filteredMockProducts = mockProducts.filter(p => p.category === category);
+            console.log('useProductsByCategory: Mock products filtered (error):', filteredMockProducts.length, 'items');
             setProducts(filteredMockProducts);
             setError(null);
         } finally {

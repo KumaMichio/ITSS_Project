@@ -5,7 +5,8 @@ interface AdminSidebarProps {
     onSectionChange: (section: string) => void;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeSection, onSectionChange }) => {    const menuItems = [
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeSection, onSectionChange }) => {
+    const menuItems = [
         { id: 'dashboard', label: 'Dashboard thống kê', icon: '📊' },
         { id: 'products', label: 'Quản lý sản phẩm', icon: '📦' },
         { id: 'add-product', label: 'Thêm sản phẩm', icon: '➕' },
@@ -31,7 +32,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeSection, onSectionCha
                     >
                         <span className="mr-3 text-lg">{item.icon}</span>
                         <span className="font-medium">{item.label}</span>
-                    </button>                ))}
+                    </button>))}
             </nav>
         </div>
     );
