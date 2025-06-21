@@ -9,6 +9,7 @@ import Login from "./views/Auth/Login";
 import Register from "./views/Auth/Register";
 import GuestOrderTest from "./views/Test/GuestOrderTest";
 import TransactionResult from "./views/Transaction/TransactionResult";
+import AdminPanel from "./views/Admin/AdminPanel";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -26,6 +27,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="/test-guest-order" element={<GuestOrderTest />} />
             <Route path="/transaction/success" element={<TransactionResult />} />
             <Route path="/transaction/fail" element={<TransactionResult />} />

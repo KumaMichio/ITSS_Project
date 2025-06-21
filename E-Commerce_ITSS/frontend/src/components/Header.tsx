@@ -80,11 +80,17 @@ const Header = () => {
                             </span>
                         )}
                     </Link>
-                </li>
-
-                {/* Authentication */}
+                </li>                {/* Authentication */}
                 {isAuthenticated ? (
                     <li className="flex items-center space-x-3">
+                        {user?.role === 'admin' && (
+                            <Link
+                                to="/admin"
+                                className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold hover:bg-red-600 transition"
+                            >
+                                ADMIN
+                            </Link>
+                        )}
                         <span className="text-sm text-gray-600">
                             Xin chào, {user?.username}
                         </span>

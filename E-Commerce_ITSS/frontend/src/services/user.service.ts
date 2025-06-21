@@ -22,6 +22,10 @@ export class UserService {
     async changeUserRole(id: number, role: string) {
         return apiService.put<User>(`${API_ENDPOINTS.USERS.CHANGE_ROLE(id)}?role=${encodeURIComponent(role)}`);
     }
+
+    async createUser(userData: { username: string; email: string; password: string; role: string }) {
+        return apiService.post<User>('/api/register', userData);
+    }
 }
 
 export const userService = new UserService();

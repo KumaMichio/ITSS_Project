@@ -126,4 +126,12 @@ ALTER TABLE transactioninformation
 ADD CONSTRAINT fk_transInfo_orders
 FOREIGN KEY (order_id) REFERENCES orders(order_id);
 
+-- Insert default admin user
+-- Password is "admin123" (BCrypt encoded)
+INSERT INTO users (username, email, `role`, `password`) VALUES 
+('admin', 'admin@example.com', 'admin', '$2a$10$CwTycUXWue0Thq9StjUM0uJ/eO8CjGvJXMfBITVGCdqBZMJJTKkZe');
 
+-- Insert some test users
+INSERT INTO users (username, email, `role`, `password`) VALUES 
+('customer1', 'customer1@example.com', 'customer', '$2a$10$CwTycUXWue0Thq9StjUM0uJ/eO8CjGvJXMfBITVGCdqBZMJJTKkZe'),
+('seller1', 'seller1@example.com', 'seller', '$2a$10$CwTycUXWue0Thq9StjUM0uJ/eO8CjGvJXMfBITVGCdqBZMJJTKkZe');

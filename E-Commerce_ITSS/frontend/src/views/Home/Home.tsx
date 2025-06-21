@@ -3,7 +3,9 @@ import FeatureBox from "../../components/FeatureBox";
 import ProductCard from "../../components/ProductCard";
 import Loading from "../../components/Loading";
 import { useRandomProducts, useCategories } from "../../hooks/useProducts";
+import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 
 // Import images
 import hero4 from "../../img/hero4.png";
@@ -24,8 +26,14 @@ const categoryImages: { [key: string]: string } = {
 };
 
 const Home = () => {
+    const { user, isAuthenticated } = useAuth();
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 20;
+
+    // If user is admin, redirect to admin panel
+    if (isAuthenticated && user?.role === 'admin') {
+        return <Navigate to="/admin" replace />;
+    }
 
     // Fetch 20 random products for current page
     const { products, loading: productsLoading, error: productsError, refetch } = useRandomProducts(productsPerPage);
