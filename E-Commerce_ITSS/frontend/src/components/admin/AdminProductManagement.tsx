@@ -200,9 +200,8 @@ const AdminProductManagement: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
-    useEffect(() => {
-        fetchProducts();
-    }, [currentPage]); const fetchProducts = async () => {
+    // Fetch products function
+    const fetchProducts = async () => {
         try {
             setLoading(true);
             setError(null);
@@ -215,14 +214,11 @@ const AdminProductManagement: React.FC = () => {
             console.log('API Response:', response);
 
             if (response.success) {
-                // Check if response.data is an array (direct products) or PageResponse structure
                 if (Array.isArray(response.data)) {
-                    // Direct array response
                     console.log('Direct array response:', response.data);
                     setProducts(response.data);
-                    setTotalPages(1); // Assume single page for direct array
+                    setTotalPages(1);
                 } else {
-                    // PageResponse structure
                     const pageResponse = response.data as PageResponse<Product>;
                     console.log('PageResponse structure:', pageResponse);
                     setProducts(pageResponse.content);
@@ -238,6 +234,11 @@ const AdminProductManagement: React.FC = () => {
             setLoading(false);
         }
     };
+
+    // Load data on mount and when currentPage changes
+    useEffect(() => {
+        fetchProducts();
+    }, [currentPage]);
 
     const handleDeleteProduct = async (productId: number) => {
         if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {

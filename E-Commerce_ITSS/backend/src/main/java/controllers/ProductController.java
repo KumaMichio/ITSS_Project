@@ -5,6 +5,7 @@ import models.Book;
 import models.CDLP;
 import models.DVD;
 import models.Product;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import services.BookService;
 import services.CDLPService;
@@ -12,6 +13,7 @@ import services.DVDService;
 import services.ProductService;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -87,8 +89,22 @@ public class ProductController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteProduct(@PathVariable int id) {
-        productService.deleteProduct(id);
+    public ResponseEntity<?> deleteProduct(@PathVariable int id) {
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok().build();
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Handle foreign key constraint violations
+            if (e.getMessage().contains("fk_orderitem_product")) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Cannot delete product - it is referenced in existing orders"));
+            }
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Cannot delete product due to data constraints"));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "An error occurred while deleting the product"));
+        }
     }
 
     // --------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 package security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+// Removed unused Autowired
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,13 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    private CustomUserDetailsService userDetailsService;
+    // Removed unused CustomUserDetailsService
 
     private JwtAuthEntryPoint jwtAuthEntryPoint;
 
-    @Autowired
-    public WebSecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint) {
-        this.userDetailsService = userDetailsService;
+    public WebSecurityConfig(JwtAuthEntryPoint jwtAuthEntryPoint) {
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
     }
 
@@ -34,14 +32,27 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults()) // Enable CORS
+                .cors(Customizer.withDefaults())
                 .exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthEntryPoint)
                         .accessDeniedPage("/error/access-denied"))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll() // Allow all product endpoints
+                        // Product endpoints security configuration
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasAnyAuthority("admin", "ROLE_admin") // Restrict
+                                                                                                                       // DELETE
+                                                                                                                       // to
+                                                                                                                       // admin
+                        .requestMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority("admin", "ROLE_admin") // Restrict
+                                                                                                                     // POST
+                                                                                                                     // to
+                                                                                                                     // admin
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasAnyAuthority("admin", "ROLE_admin") // Restrict
+                                                                                                                    // PUT
+                                                                                                                    // to
+                                                                                                                    // admin
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll() // Allow GET for all
                         .requestMatchers("/api/payment/**").permitAll() // Allow all payment endpoints
                         .requestMatchers(HttpMethod.POST, "/api/payment/**").permitAll() // Allow POST to payment
                                                                                          // endpoints
