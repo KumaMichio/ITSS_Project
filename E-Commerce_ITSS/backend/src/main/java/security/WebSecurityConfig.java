@@ -10,20 +10,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -57,9 +48,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/vnpay-demo.html").permitAll() // Allow VNPay demo page
                         .requestMatchers("/static/**", "/css/**", "/js/**", "/images/**").permitAll() // Allow static
                                                                                                       // resources
-                        .requestMatchers(HttpMethod.POST, "/api/user").hasAuthority("admin") // Allow authenticated
-                                                                                             // users to
-                        // create users
+                        .requestMatchers(HttpMethod.POST, "/api/user").hasAnyAuthority("admin", "ROLE_admin") // Support
+                                                                                                              // both
+                                                                                                              // formats
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll() // Allow all GET requests to API
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());

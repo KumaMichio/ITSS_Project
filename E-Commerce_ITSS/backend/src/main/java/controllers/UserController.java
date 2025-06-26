@@ -5,6 +5,8 @@ import models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,6 +32,31 @@ public class UserController {
         System.out.println("🔄 UserController - Create user request received");
         System.out.println("📝 UserController - User data: " + userData.getUsername() + ", " + userData.getEmail()
                 + ", role: " + userData.getRole());
+
+        // Debug: Check password field
+        System.out.println("🔍 UserController - Password received: "
+                + (userData.getPassword() != null ? "YES (length: " + userData.getPassword().length() + ")" : "NULL"));
+
+        // Debug: Print raw request info if possible
+        System.out.println("🔍 UserController - Full user object: " + userData.toString());
+
+        // Debug: Check current authentication
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            System.out.println("🔍 Current user: " + authentication.getName());
+            System.out.println("🔍 Current authorities: " + authentication.getAuthorities());
+            authentication.getAuthorities().forEach(auth -> {
+                System.out.println("  - Authority: " + auth.getAuthority());
+            });
+        } else {
+            System.out.println("❌ No authentication found");
+        }
+
+        // Check if password is null and return early with error
+        if (userData.getPassword() == null || userData.getPassword().trim().isEmpty()) {
+            System.out.println("❌ UserController - Password is null or empty");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password cannot be null or empty");
+        }
 
         // Check if username already exists
         if (userRepository.existsByUsername(userData.getUsername())) {

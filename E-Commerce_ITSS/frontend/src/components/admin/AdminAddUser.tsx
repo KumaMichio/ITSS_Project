@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { userService } from '../../services/user.service';
+import '../../utils/authDebug'; // Import auth debug utility
+import '../../utils/quickAdminLogin'; // Import quick admin login helper
 
 const AdminAddUser: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -17,6 +19,27 @@ const AdminAddUser: React.FC = () => {
         setLoading(true);
         setError(null);
         setSuccess(null);
+
+        // Debug: Check auth state before making request
+        console.log('=== PRE-REQUEST AUTH DEBUG ===');
+        const token = localStorage.getItem('authToken');
+        const user = localStorage.getItem('user');
+        console.log('Token exists:', !!token);
+        if (user) {
+            try {
+                const userData = JSON.parse(user);
+                console.log('User role:', userData.role);
+                console.log('Full user data:', userData);
+            } catch (e) {
+                console.error('Error parsing user:', e);
+            }
+        }
+        console.log('==============================');
+
+        // Debug: Log form data being sent
+        console.log('🔍 Form data being sent:', formData);
+        console.log('🔍 Password field value:', formData.password);
+        console.log('🔍 Password length:', formData.password?.length || 'undefined');
 
         try {
             const response = await userService.createUser(formData);
@@ -61,6 +84,17 @@ const AdminAddUser: React.FC = () => {
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     <p className="font-bold">Lỗi</p>
                     <p>{error}</p>
+                    {error.includes('401') || error.includes('Unauthorized') ? (
+                        <div className="mt-2">
+                            <p className="text-sm">Bạn cần đăng nhập với tài khoản admin. Thử:</p>
+                            <button
+                                onClick={() => (window as any).quickAdminLogin()}
+                                className="mt-1 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                            >
+                                Đăng nhập Admin (admin/admin123)
+                            </button>
+                        </div>
+                    ) : null}
                 </div>
             )}
 
