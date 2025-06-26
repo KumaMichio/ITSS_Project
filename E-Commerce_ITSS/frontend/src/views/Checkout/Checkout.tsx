@@ -279,11 +279,24 @@ const Checkout = () => {
                 type: 'info'
             });
 
-            // Calculate total amount including shipping
-            const shippingFee = shippingMethod === 'rush'
-                ? (shippingOptions.express?.expressShippingFee || 30000)
-                : (shippingOptions.regular?.regularShippingFee || 15000);
+            // Calculate total amount including shipping - Use same logic as UI display
+            const shippingFee = getShippingFee();
             const totalAmount = totalPrice + shippingFee;
+
+            // Debug logging
+            console.log('=== Frontend Payment Debug ===');
+            console.log('totalPrice from cart:', totalPrice);
+            console.log('shippingFee:', shippingFee);
+            console.log('totalAmount (totalPrice + shippingFee):', totalAmount);
+            console.log('shippingMethod:', shippingMethod);
+            console.log('Cart items:');
+            items.forEach((item, index) => {
+                console.log(`  Item ${index + 1}: ${item.product.title}`);
+                console.log(`    - Price: ${item.product.price}`);
+                console.log(`    - Quantity: ${item.quantity}`);
+                console.log(`    - Subtotal: ${item.product.price * item.quantity}`);
+            });
+            console.log('=============================');
 
             console.log('Payment details:', { orderId, totalAmount, shippingFee, totalPrice });
 
@@ -603,7 +616,7 @@ const Checkout = () => {
                                             className="accent-[#2aa59b]"
                                         />
                                         <div className="flex-1">
-                                            <div className="font-medium">Giao hàng nhanh 2h ⚡</div>
+                                            <div className="font-medium">Giao hàng nhanh 2h</div>
                                             <div className="text-sm text-gray-600">
                                                 Phí vận chuyển: {formatPrice(shippingOptions.express?.expressShippingFee || 30000)}
                                             </div>
@@ -676,7 +689,7 @@ const Checkout = () => {
                                     )}
                                 </button>
 
-                                <button
+                                {/* <button
                                     onClick={handleConfirmPayment}
                                     disabled={productValidation.isChecking || !productValidation.isValid}
                                     className="w-full bg-[#2aa59b] text-white py-4 text-lg font-semibold rounded-lg hover:bg-[#21857d] transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -692,22 +705,9 @@ const Checkout = () => {
                                             Hiển thị QR Code
                                         </>
                                     )}
-                                </button>
+                                </button> */}
 
-                                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                    <p className="text-sm text-yellow-800">
-                                        <i className="fas fa-info-circle mr-1"></i>
-                                        Bạn có thể thanh toán bằng cách quét QR code hoặc chuyển hướng đến trang VNPay
-                                    </p>
-                                </div>
 
-                                {/* Debug info when backend is offline */}
-                                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                    <p className="text-sm text-blue-800">
-                                        <i className="fas fa-info-circle mr-1"></i>
-                                        Lưu ý: Nếu backend không chạy, hệ thống sẽ chuyển đến trang VNPay demo để test
-                                    </p>
-                                </div>
                             </div>
                         </div>
                     </div>

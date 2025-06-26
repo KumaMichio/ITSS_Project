@@ -154,13 +154,13 @@ const ProductDetail = () => {
                             {product.quantity > 0 ? (
                                 product.quantity <= 5 ? (
                                     <p className="text-orange-600 font-semibold">
-                                        ⚠️ Chỉ còn {product.quantity} sản phẩm
+                                        Chỉ còn {product.quantity} sản phẩm
                                     </p>
                                 ) : (
-                                    <p className="text-green-600">✅ Còn {product.quantity} sản phẩm</p>
+                                    <p className="text-green-600">Còn {product.quantity} sản phẩm</p>
                                 )
                             ) : (
-                                <p className="text-red-600 font-semibold">❌ Hết hàng</p>
+                                <p className="text-red-600 font-semibold">Hết hàng</p>
                             )}
                         </div>
 

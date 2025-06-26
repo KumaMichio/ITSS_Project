@@ -130,7 +130,7 @@ export class PaymentService {
         }
 
         // Backend is healthy, proceed with normal flow
-        return this.createVNPayPaymentForOrder(orderId);
+        return this.createVNPayPaymentForOrder(orderId, amount);
     }
 
     /**

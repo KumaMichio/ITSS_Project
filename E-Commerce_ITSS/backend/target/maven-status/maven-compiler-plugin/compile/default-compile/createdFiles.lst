@@ -8,7 +8,9 @@ exceptions\ProductServiceCustomException.class
 request\ProductRequest$ProductRequestBuilder.class
 dtos\PaymentDTO.class
 controllers\UserController.class
+vnpay\service\VNPayService.class
 services\ICartService.class
+vnpay\dto\VNPayResponse.class
 config\VNPayConstant.class
 controllers\CartController.class
 services\StockValidationService$StockValidationResult.class
@@ -18,6 +20,7 @@ models\ShippingMethod.class
 models\DeliveryInformation$DeliveryInformationBuilder.class
 controllers\ProductController.class
 util\VNPayUtil.class
+services\VNPayService.class
 security\CustomUserDetailsService$CustomGrantedAuthority.class
 config\VNPayConfig.class
 services\BookService.class
@@ -46,12 +49,15 @@ models\DVD$DVDBuilder.class
 repositories\UserRepository.class
 models\Order.class
 models\DeliveryInformation.class
+vnpay\dto\VNPayRequest.class
+services\VNPayIntegrationService.class
 services\DeliveryInfoService.class
 services\ShippingMethodService.class
 services\UserService.class
 dtos\PaymentDTO$VNPayRequest.class
 services\GuestOrderService.class
 services\StockValidationService.class
+vnpay\controller\VNPayController.class
 security\CustomUserDetailsService.class
 controllers\GuestOrderController.class
 repositories\ProductRepository.class
@@ -83,6 +89,7 @@ services\ShippingCalculatorService.class
 services\EmailService.class
 exceptions\ResourceNotFoundException.class
 dtos\GuestDeliveryInfoDTO.class
+vnpay\common\VNPayConfig.class
 services\OrderService.class
 models\OrderItem.class
 services\GuestOrderService$ShippingPreview.class

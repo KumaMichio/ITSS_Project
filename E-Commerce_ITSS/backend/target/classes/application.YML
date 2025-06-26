@@ -6,7 +6,7 @@ spring:
     name: Project_ITSS
     api-prefix: /api
   datasource:
-    url: jdbc:mysql://localhost:3306/aims_database?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/aims_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: admin
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -22,7 +22,7 @@ spring:
 vnPay:
   # VNPay gateway URLs
   url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  returnUrl: http://localhost:8080/api/payment/vn-pay-callback
+  returnUrl: http://localhost:3000/payment/vnpay-return
   # Merchant configuration - Updated with new sandbox credentials
   tmnCode: ZAVGV1VT
   secretKey: OR92SDL9CRPL5TOXFICMKRVASZ4FXJ4M

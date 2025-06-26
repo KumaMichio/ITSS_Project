@@ -155,12 +155,12 @@ export default function Cart() {
                                                 {/* Stock Warning */}
                                                 {item.product.quantity <= 5 && (
                                                     <p className="text-xs text-orange-600 font-semibold mt-1">
-                                                        ⚠️ Chỉ còn {item.product.quantity} sản phẩm
+                                                        Chỉ còn {item.product.quantity} sản phẩm
                                                     </p>
                                                 )}
                                                 {item.quantity > item.product.quantity && (
                                                     <p className="text-xs text-red-600 font-semibold mt-1">
-                                                        ❌ Không đủ hàng (có {item.product.quantity})
+                                                        Không đủ hàng (có {item.product.quantity})
                                                     </p>
                                                 )}
                                             </div>
@@ -207,7 +207,7 @@ export default function Cart() {
 
                         <div className="bg-gray-50 p-6 rounded-lg shadow-sm border">
                             <div className="space-y-3 mb-4">
-                                <div className="flex justify-between items-center text-gray-600">
+                                {/* <div className="flex justify-between items-center text-gray-600">
                                     <span>Tổng tiền hàng:</span>
                                     <span className="font-semibold">{formatPrice(totalPrice)}</span>
                                 </div>
@@ -215,9 +215,9 @@ export default function Cart() {
                                     <span>Phí vận chuyển:</span>
                                     <span className="font-semibold">Miễn phí</span>
                                 </div>
-                                <hr className="border-gray-300" />
+                                <hr className="border-gray-300" /> */}
                                 <div className="flex justify-between items-center text-xl font-bold text-[#088178]">
-                                    <span>Tổng cộng:</span>
+                                    <span>Tổng cộng: </span>
                                     <span>{formatPrice(totalPrice)}</span>
                                 </div>
                             </div>                            <button

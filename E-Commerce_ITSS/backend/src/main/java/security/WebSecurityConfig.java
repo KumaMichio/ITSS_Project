@@ -48,12 +48,19 @@ public class WebSecurityConfig {
                         .accessDeniedPage("/error/access-denied"))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll() // Allow all product endpoints
                         .requestMatchers("/api/payment/**").permitAll() // Allow all payment endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll() // Allow all GET requests to API
                         .requestMatchers(HttpMethod.POST, "/api/payment/**").permitAll() // Allow POST to payment
                                                                                          // endpoints
+                        .requestMatchers("/vnpay-demo.html").permitAll() // Allow VNPay demo page
+                        .requestMatchers("/static/**", "/css/**", "/js/**", "/images/**").permitAll() // Allow static
+                                                                                                      // resources
+                        .requestMatchers(HttpMethod.POST, "/api/user").hasAuthority("admin") // Allow authenticated
+                                                                                             // users to
+                        // create users
+                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll() // Allow all GET requests to API
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 

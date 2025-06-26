@@ -93,13 +93,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, stars = 5 }) => {
                 {product.quantity > 0 ? (
                     product.quantity <= 5 ? (
                         <p className="text-xs text-orange-600 font-semibold">
-                            ⚠️ Chỉ còn {product.quantity} sản phẩm
+                            Chỉ còn {product.quantity} sản phẩm
                         </p>
                     ) : (
                         <p className="text-xs text-green-600">Còn {product.quantity} sản phẩm</p>
                     )
                 ) : (
-                    <p className="text-xs text-red-600 font-semibold">❌ Hết hàng</p>
+                    <p className="text-xs text-red-600 font-semibold">Hết hàng</p>
                 )}
             </div>            <button
                 onClick={handleAddToCart}

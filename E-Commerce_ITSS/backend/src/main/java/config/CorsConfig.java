@@ -36,8 +36,9 @@ public class CorsConfig implements WebMvcConfigurer {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         // Allow all headers for debugging and payment processing
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type")); // Headers client needs to
-                                                                                         // access
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type", "Access-Control-Allow-Origin",
+                "Access-Control-Allow-Headers", "Access-Control-Allow-Methods")); // Headers client needs to
+        // access
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L); // How long the results of a preflight request can be cached
 

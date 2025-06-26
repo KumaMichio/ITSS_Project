@@ -65,7 +65,7 @@ const Home = () => {
                 className="bg-cover bg-center flex flex-col justify-center px-20 py-10 min-h-[400px]"
                 style={{ backgroundImage: `url(${hero4})` }}
             >
-                <div className="text-white">
+                <div className="text-black">
                     <h1 className="text-5xl font-bold mb-4">Chào mừng đến với cửa hàng</h1>
                     <p className="text-xl">Khám phá những sản phẩm tuyệt vời</p>
                 </div>

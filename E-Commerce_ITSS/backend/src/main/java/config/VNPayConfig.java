@@ -79,6 +79,11 @@ public class VNPayConfig {
         return apiUrl;
     }
 
+    public String getUrl() {
+        return vnp_PayUrl;
+    }
+
+    // Getter methods for additional properties
     public String getTmnCode() {
         return vnp_TmnCode;
     }

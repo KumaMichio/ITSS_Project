@@ -2,7 +2,6 @@ package security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +39,11 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            System.out.println("✅ JwtTokenProvider - Token validation successful");
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
-            throw new AuthenticationCredentialsNotFoundException("JWT was expired or incorrect", ex);
+            System.out.println("❌ JwtTokenProvider - Token validation failed: " + ex.getMessage());
+            return false;
         }
     }
 }

@@ -21,7 +21,7 @@ class ApiService {
                 ...options,
             };
 
-            console.log('API Request:', { url, method: config.method || 'GET', includeAuth });
+            console.log('API Request:', { url, method: config.method || 'GET', includeAuth, headers: config.headers, body: options.body });
 
             const response = await fetch(url, config);
 

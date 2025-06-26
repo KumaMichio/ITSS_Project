@@ -24,7 +24,7 @@ export class UserService {
     }
 
     async createUser(userData: { username: string; email: string; password: string; role: string }) {
-        return apiService.post<User>('/api/register', userData);
+        return apiService.post<User>(API_ENDPOINTS.USERS.BASE, userData);
     }
 }
 

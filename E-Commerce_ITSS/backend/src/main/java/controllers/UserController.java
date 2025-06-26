@@ -5,8 +5,10 @@ import models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import repositories.UserRepository;
 import services.UserService;
 
 import java.util.List;
@@ -16,6 +18,32 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @PostMapping("/user")
+    public ResponseEntity<User> createUser(@RequestBody User userData) {
+        System.out.println("🔄 UserController - Create user request received");
+        System.out.println("📝 UserController - User data: " + userData.getUsername() + ", " + userData.getEmail()
+                + ", role: " + userData.getRole());
+
+        // Check if username already exists
+        if (userRepository.existsByUsername(userData.getUsername())) {
+            System.out.println("❌ UserController - Username already exists: " + userData.getUsername());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is already taken");
+        }
+
+        // Encode password and create user
+        userData.setPassword(passwordEncoder.encode(userData.getPassword()));
+        User createdUser = userService.createUser(userData);
+
+        System.out.println("✅ UserController - User created successfully: " + createdUser.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
 
     @PutMapping("/update-user/{id}")
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user, @PathVariable int id) {
@@ -45,9 +73,15 @@ public class UserController {
     public ResponseEntity<User> changeUserRole(@PathVariable int id, @RequestParam String role) {
 
         User updatedUser = userService.changeUserRole(id, role);
-        if(updatedUser != null)
+        if (updatedUser != null)
             return ResponseEntity.ok(updatedUser);
         else
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot change user role");
+    }
+
+    @GetMapping("/user/test-auth")
+    public ResponseEntity<String> testAuth() {
+        System.out.println("🧪 UserController - Test auth endpoint called");
+        return ResponseEntity.ok("Authentication successful!");
     }
 }
