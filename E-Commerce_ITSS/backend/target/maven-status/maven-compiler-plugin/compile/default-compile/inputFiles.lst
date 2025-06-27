@@ -1,5 +1,6 @@
 D:\CODE\Capstone\ITSS_Project\E-Commerce_ITSS\backend\src\main\java\code\kuma\Project_ITSS\ProjectItssApplication.java
 D:\CODE\Capstone\ITSS_Project\E-Commerce_ITSS\backend\src\main\java\config\CorsConfig.java
+D:\CODE\Capstone\ITSS_Project\E-Commerce_ITSS\backend\src\main\java\config\SecurityConfig.java
 D:\CODE\Capstone\ITSS_Project\E-Commerce_ITSS\backend\src\main\java\config\VNPayConfig.java
 D:\CODE\Capstone\ITSS_Project\E-Commerce_ITSS\backend\src\main\java\config\VNPayConstant.java
 D:\CODE\Capstone\ITSS_Project\E-Commerce_ITSS\backend\src\main\java\controllers\AuthController.java

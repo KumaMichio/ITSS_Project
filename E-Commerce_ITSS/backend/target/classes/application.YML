@@ -22,7 +22,7 @@ spring:
 vnPay:
   # VNPay gateway URLs
   url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  returnUrl: http://localhost:3000/payment/vnpay-return
+  returnUrl: http://localhost:5173/payment/vnpay-return
   # Merchant configuration - Updated with new sandbox credentials
   tmnCode: ZAVGV1VT
   secretKey: OR92SDL9CRPL5TOXFICMKRVASZ4FXJ4M

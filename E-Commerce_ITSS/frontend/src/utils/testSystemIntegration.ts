@@ -1,5 +1,5 @@
 // Test Runner for Guest Order System
-// Run this in browser console at localhost:3000
+// Run this in browser console at localhost:5173
 
 async function runGuestOrderSystemTest() {
     console.log('🚀 Starting Guest Order System Test...\n');

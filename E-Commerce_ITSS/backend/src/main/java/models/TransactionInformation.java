@@ -19,7 +19,7 @@ public class TransactionInformation {
     private int transactionId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", referencedColumnName = "order_id", nullable = false)
+    @JoinColumn(name = "order_id", referencedColumnName = "order_id", nullable = true)
     private Order order;
 
     @Column(name = "total_fee")
@@ -36,5 +36,22 @@ public class TransactionInformation {
 
     @Column(name = "payment_method")
     private String paymentMethod;
+
+    @Column(name = "vnp_transaction_no")
+    private String vnpTransactionNo;
+
+    @Column(name = "vnp_bank_code")
+    private String vnpBankCode;
+
+    @Column(name = "vnp_bank_tran_no")
+    private String vnpBankTranNo;
+
+    @Column(name = "vnp_response_code")
+    private String vnpResponseCode;
+
+    // Store the original VNPay transaction reference for cases where order_id is
+    // too large
+    @Column(name = "order_reference")
+    private String orderReference;
 
 }

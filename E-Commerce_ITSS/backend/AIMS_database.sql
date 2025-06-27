@@ -11,7 +11,7 @@ CREATE TABLE products(
   user_id INT
 );
 
-CREATE TABLE shippingmethod (
+CREATE TABLE shipping_method (
   method_id INT PRIMARY KEY AUTO_INCREMENT,
   method_name VARCHAR(255),
   is_rush BOOLEAN,
@@ -29,13 +29,18 @@ CREATE TABLE delivery_info (
 );
 
 CREATE TABLE transactioninformation (
-  transaction_id INT PRIMARY KEY,
+  transaction_id INT PRIMARY KEY AUTO_INCREMENT,
   order_id INT,
   total_fee DOUBLE,
   `status` VARCHAR(255),
   transaction_time DATETIME,
   content VARCHAR(255),
-  payment_method VARCHAR(255)
+  payment_method VARCHAR(255),
+  vnp_transaction_no VARCHAR(255),
+  vnp_bank_code VARCHAR(255),
+  vnp_bank_tran_no VARCHAR(255),
+  vnp_response_code VARCHAR(255),
+  order_reference VARCHAR(255)
 );
 
 CREATE TABLE books(
@@ -114,7 +119,7 @@ FOREIGN KEY (delivery_id) REFERENCES delivery_info(id),
 ADD CONSTRAINT fk_orders_transaction
 FOREIGN KEY (transaction_id) REFERENCES transactioninformation(transaction_id),
 ADD CONSTRAINT fk_orders_shippingmethod
-FOREIGN KEY (method_id) REFERENCES shippingmethod(method_id);
+FOREIGN KEY (method_id) REFERENCES shipping_method(method_id);
 
 ALTER TABLE orderitem
 ADD CONSTRAINT fk_orderitem_order
@@ -135,3 +140,13 @@ INSERT INTO users (username, email, `role`, `password`) VALUES
 INSERT INTO users (username, email, `role`, `password`) VALUES 
 ('customer1', 'customer1@example.com', 'customer', '$2a$10$CwTycUXWue0Thq9StjUM0uJ/eO8CjGvJXMfBITVGCdqBZMJJTKkZe'),
 ('seller1', 'seller1@example.com', 'seller', '$2a$10$CwTycUXWue0Thq9StjUM0uJ/eO8CjGvJXMfBITVGCdqBZMJJTKkZe');
+
+-- Insert default shipping methods
+INSERT INTO shipping_method (method_name, is_rush, shipping_fees) VALUES 
+('Standard Shipping', false, 30000),
+('Rush Shipping', true, 50000),
+('Express Shipping', true, 80000);
+
+-- Insert default delivery info for testing
+INSERT INTO delivery_info (`name`, phone, `address`, province, instruction, user_id) VALUES 
+('Test User', '0123456789', '123 Test Street', 'Ho Chi Minh City', 'Test delivery', 1);

@@ -30,14 +30,14 @@ const Home = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 20;
 
+    // Fetch 20 random products for current page
+    const { products, loading: productsLoading, error: productsError, refetch } = useRandomProducts(productsPerPage);
+    const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
+
     // If user is admin, redirect to admin panel
     if (isAuthenticated && user?.role === 'admin') {
         return <Navigate to="/admin" replace />;
     }
-
-    // Fetch 20 random products for current page
-    const { products, loading: productsLoading, error: productsError, refetch } = useRandomProducts(productsPerPage);
-    const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
 
     // Create features array from categories
     const features = categories.map(category => ({

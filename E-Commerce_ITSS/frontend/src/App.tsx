@@ -34,6 +34,8 @@ function App() {
                 <Route path="/test-guest-order" element={<GuestOrderTest />} />
                 <Route path="/transaction/success" element={<TransactionResult />} />
                 <Route path="/transaction/fail" element={<TransactionResult />} />
+                {/* VNPay return URL */}
+                <Route path="/payment/vnpay-return" element={<TransactionResult />} />
               </Routes>
             </Router>
 

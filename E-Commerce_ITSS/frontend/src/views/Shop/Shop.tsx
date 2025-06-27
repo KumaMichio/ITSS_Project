@@ -101,6 +101,7 @@ const Shop = () => {
         setFilter(newFilter);
     };
 
+    // Render error state if there's an error
     if (error) {
         return (
             <>
