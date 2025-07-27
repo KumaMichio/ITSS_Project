@@ -89,11 +89,11 @@ AIMS (An Internet Media Store) là một ứng dụng thương mại điện t�
 cd backend
 ./mvnw spring-boot:run
 
-### Frontend
+### Frontend:
 cd frontend
 npm install
 npm run dev
 
-### Database
+### Database:
 - Import file aims_schema.sql từ thư mục /sql vào MySQL
 - Đảm bảo thông tin kết nối đúng trong application.YML
