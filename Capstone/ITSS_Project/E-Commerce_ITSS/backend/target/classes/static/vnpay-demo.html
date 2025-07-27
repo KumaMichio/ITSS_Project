@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNPay Payment Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">VNPAY DEMO - Tạo mới đơn hàng</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="frmCreateOrder">
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Số tiền (VND)</label>
+                                <input type="number" class="form-control" id="amount" name="amount" min="1"
+                                    max="100000000" value="100000" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <h5>Chọn phương thức thanh toán</h5>
+                                <div class="mb-2">
+                                    <h6>Cách 1: Chuyển hướng sang Cổng VNPAY chọn phương thức thanh toán</h6>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="bankCode" id="vnpayqr1"
+                                            value="" checked>
+                                        <label class="form-check-label" for="vnpayqr1">
+                                            Cổng thanh toán VNPAYQR
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <h6>Cách 2: Tách phương thức tại site của đơn vị kết nối</h6>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="bankCode" id="vnpayqr2"
+                                            value="VNPAYQR">
+                                        <label class="form-check-label" for="vnpayqr2">
+                                            Thanh toán bằng ứng dụng hỗ trợ VNPAYQR
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="bankCode" id="vnbank"
+                                            value="VNBANK">
+                                        <label class="form-check-label" for="vnbank">
+                                            Thanh toán qua thẻ ATM/Tài khoản nội địa
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="bankCode" id="intcard"
+                                            value="INTCARD">
+                                        <label class="form-check-label" for="intcard">
+                                            Thanh toán qua thẻ quốc tế
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <h5>Chọn ngôn ngữ giao diện thanh toán:</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="language" id="lang_vn" value="vn"
+                                        checked>
+                                    <label class="form-check-label" for="lang_vn">
+                                        Tiếng việt
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="language" id="lang_en"
+                                        value="en">
+                                    <label class="form-check-label" for="lang_en">
+                                        Tiếng anh
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Thanh toán</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <h5>Thông tin test VNPay Sandbox:</h5>
+                        <ul>
+                            <li>Số thẻ test: 9704 0000 0000 0018</li>
+                            <li>Tên chủ thẻ: NGUYEN VAN A</li>
+                            <li>Ngày phát hành: 07/15</li>
+                            <li>Mật khẩu OTP: 123456</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#frmCreateOrder").submit(function (e) {
+            e.preventDefault();
+
+            var formData = {
+                amount: $("#amount").val(),
+                bankCode: $("input[name='bankCode']:checked").val(),
+                language: $("input[name='language']:checked").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/api/payment/vnpayajax",
+                data: formData,
+                dataType: 'JSON',
+                success: function (response) {
+                    if (response.code === '00') {
+                        // Redirect to VNPay payment page
+                        window.location.href = response.data;
+                    } else {
+                        alert("Lỗi: " + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("Có lỗi xảy ra: " + error);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
