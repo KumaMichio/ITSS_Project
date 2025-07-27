@@ -73,11 +73,6 @@ AIMS (An Internet Media Store) là một ứng dụng thương mại điện t�
 
 ---
 
-## ⚙️ Cấu trúc thư mục đề xuất
-
-
----
-
 ## 📌 Ghi chú phát triển
 
 - Hỗ trợ mở rộng thêm phương thức thanh toán trong tương lai
