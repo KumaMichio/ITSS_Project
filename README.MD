@@ -82,20 +82,67 @@ AIMS (An Internet Media Store) là một ứng dụng thương mại điện t�
 
 ---
 
-## 🧪 Triển khai & Hướng dẫn chạy
+## 🚀 Triển khai & Hướng dẫn chạy
 
-### Backend:
-```bash
-cd backend
-./mvnw spring-boot:run
+### 📌 Yêu cầu hệ thống
 
-### Frontend:
-```bash
-cd frontend
-npm install
-npm run dev
+- Java 21 trở lên
+- Node.js 18.x hoặc mới hơn
+- MySQL 8.x
+- Maven (nếu không dùng wrapper)
+- Tài khoản VNPay Sandbox (để test thanh toán)
 
-### Database:
-```bash
-- Import file aims_schema.sql từ thư mục /sql vào MySQL
-- Đảm bảo thông tin kết nối đúng trong application.YML
+---
+
+### 1️⃣ Cài đặt & cấu hình cơ sở dữ liệu (MySQL)
+
+1. Khởi chạy MySQL server
+2. Tạo cơ sở dữ liệu:
+   ```sql
+   CREATE DATABASE aims_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+3. Nhập dữ liệu và bảng ban đầu:
+   ```bash
+   mysql -u root -p aims_db < sql/aims_schema.sql
+   ```
+
+---
+
+### 2️⃣ Chạy backend (Spring Boot)
+
+1. Di chuyển vào thư mục `backend/`
+2. Cập nhật file `src/main/resources/application.properties`:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/aims_db
+   spring.datasource.username=YOUR_DB_USERNAME
+   spring.datasource.password=YOUR_DB_PASSWORD
+
+   vnpay.returnUrl=http://localhost:5173/payment-return
+   ```
+3. Khởi chạy server backend:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+   Hoặc nếu bạn đã cài Maven toàn cục:
+   ```bash
+   mvn spring-boot:run
+   ```
+
+📍 Mặc định, backend chạy tại: `http://localhost:8080`
+
+---
+
+### 3️⃣ Chạy frontend (Vite + TypeScript)
+
+1. Di chuyển vào thư mục `frontend/`
+2. Cài đặt các dependencies:
+   ```bash
+   npm install
+   ```
+3. (Tuỳ chọn) Cập nhật endpoint backend trong file cấu hình (ví dụ: `.env` hoặc `src/config.ts`)
+4. Khởi chạy frontend:
+   ```bash
+   npm run dev
+   ```
+
+📍 Mặc định, frontend chạy tại: `http://localhost:5173`
